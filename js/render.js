@@ -14,6 +14,7 @@
     this.ctx = canvas.getContext('2d');
     this.engine = engine;
     this.opts = options || {};
+    this.eink = !!this.opts.eink;  // 墨水模式：純黑白、實心、無漸層、關閉落子預覽
     this.marks = [];          // [{x,y,type:'circle|triangle|square|dot', color, text}]
     this.ghost = null;        // 滑鼠預覽落子點
     this.pointCb = null;
@@ -47,6 +48,7 @@
       if (p && self.pointCb) self.pointCb(p.x, p.y);
     });
     this.canvas.addEventListener('mousemove', function (e) {
+      if (self.eink) return;  // 墨水模式不做落子預覽，避免移動時不斷重繪殘影
       var p = self._eventToGrid(e);
       var changed = (!!p !== !!self.ghost) ||
         (p && self.ghost && (p.x !== self.ghost.x || p.y !== self.ghost.y));
@@ -89,16 +91,23 @@
   BoardRenderer.prototype.draw = function () {
     var ctx = this.ctx, n = this.engine.size, px = this.pixel;
 
-    // 木紋底
-    var g = ctx.createLinearGradient(0, 0, px, px);
-    g.addColorStop(0, '#f5c877');
-    g.addColorStop(1, '#e8a94e');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, px, px);
+    // 底色（墨水模式：純白平面，無漸層）
+    if (this.eink) {
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, px, px);
+    } else {
+      var g = ctx.createLinearGradient(0, 0, px, px);
+      g.addColorStop(0, '#f5c877');
+      g.addColorStop(1, '#e8a94e');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, px, px);
+    }
+
+    var lineColor = this.eink ? '#000000' : '#5a3a1a';
 
     // 格線
-    ctx.strokeStyle = '#5a3a1a';
-    ctx.lineWidth = 1.2;
+    ctx.strokeStyle = lineColor;
+    ctx.lineWidth = this.eink ? 1.6 : 1.2;
     ctx.beginPath();
     for (var i = 0; i < n; i++) {
       ctx.moveTo(this.cx(0), this.cy(i)); ctx.lineTo(this.cx(n - 1), this.cy(i));
@@ -107,7 +116,7 @@
     ctx.stroke();
 
     // 座標標示（A.. / 1..）
-    ctx.fillStyle = '#6b4a24';
+    ctx.fillStyle = this.eink ? '#000000' : '#6b4a24';
     ctx.font = Math.max(9, this.grid * 0.32) + 'px system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -119,7 +128,7 @@
 
     // 星位
     var stars = this._starPoints();
-    ctx.fillStyle = '#5a3a1a';
+    ctx.fillStyle = lineColor;
     for (var s = 0; s < stars.length; s++) {
       ctx.beginPath();
       ctx.arc(this.cx(stars[s][0]), this.cy(stars[s][1]), Math.max(2.5, this.grid * 0.08), 0, Math.PI * 2);
@@ -142,11 +151,18 @@
     // 最後一手標記
     var lm = this.engine.lastMove;
     if (lm) {
-      ctx.strokeStyle = lm.color === BLACK ? '#ff5252' : '#ff5252';
-      ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      ctx.arc(this.cx(lm.x), this.cy(lm.y), this.stoneR * 0.5, 0, Math.PI * 2);
-      ctx.stroke();
+      if (this.eink) {
+        // 墨水：在棋子中央畫與棋子相反色的實心小方塊，高對比不靠顏色
+        ctx.fillStyle = lm.color === BLACK ? '#ffffff' : '#000000';
+        var hs = this.stoneR * 0.32;
+        ctx.fillRect(this.cx(lm.x) - hs, this.cy(lm.y) - hs, hs * 2, hs * 2);
+      } else {
+        ctx.strokeStyle = '#ff5252';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(this.cx(lm.x), this.cy(lm.y), this.stoneR * 0.5, 0, Math.PI * 2);
+        ctx.stroke();
+      }
     }
 
     // 練習標記
@@ -155,6 +171,27 @@
 
   BoardRenderer.prototype._drawStone = function (x, y, color, alpha) {
     var ctx = this.ctx, cx = this.cx(x), cy = this.cy(y), r = this.stoneR;
+
+    // 墨水模式：實心黑棋 / 白棋為白底粗黑框，無陰影無漸層
+    if (this.eink) {
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      if (color === BLACK) {
+        ctx.fillStyle = '#000000';
+        ctx.fill();
+      } else {
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+        ctx.lineWidth = Math.max(2, r * 0.2);
+        ctx.strokeStyle = '#000000';
+        ctx.stroke();
+      }
+      ctx.restore();
+      return;
+    }
+
     ctx.save();
     ctx.globalAlpha = alpha;
     // 陰影
@@ -175,10 +212,11 @@
 
   BoardRenderer.prototype._drawMark = function (m) {
     var ctx = this.ctx, cx = this.cx(m.x), cy = this.cy(m.y), r = this.stoneR * 0.6;
+    var dflt = this.eink ? '#000000' : '#ff3b3b';
     ctx.save();
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = m.color || '#ff3b3b';
-    ctx.fillStyle = m.color || '#ff3b3b';
+    ctx.lineWidth = this.eink ? 3.5 : 3;
+    ctx.strokeStyle = m.color || dflt;
+    ctx.fillStyle = m.color || dflt;
     if (m.type === 'circle') {
       ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
     } else if (m.type === 'square') {

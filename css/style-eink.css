@@ -1,0 +1,190 @@
+/* 墨水閱讀器專用樣式：純黑白高對比、無漸層、無動畫、大字大按鈕
+   適用 Kindle / Boox / reMarkable 等 e-ink 裝置 */
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+  background: #ffffff;
+  color: #000000;
+  min-height: 100vh;
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+header { text-align: center; padding: 16px 12px 4px; }
+header h1 { margin: 0; font-size: 28px; font-weight: 800; letter-spacing: 1px; }
+header h1 .go { color: #000; text-decoration: underline; }
+header p { margin: 4px 0 0; font-size: 15px; }
+
+/* 模式分頁 */
+.tabs {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 14px 0 8px;
+  flex-wrap: wrap;
+}
+.tab {
+  border: 2.5px solid #000;
+  background: #fff;
+  color: #000;
+  font-size: 18px;
+  font-weight: 700;
+  padding: 10px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.tab.active { background: #000; color: #fff; }
+
+.page { display: none; padding: 8px 14px 30px; }
+.page.active { display: block; }
+
+.layout {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.board-wrap {
+  background: #fff;
+  padding: 8px;
+  border: 3px solid #000;
+  border-radius: 6px;
+}
+canvas {
+  display: block;
+  cursor: pointer;
+  touch-action: manipulation;
+  background: #fff;
+}
+
+/* 側欄面板 */
+.panel {
+  background: #fff;
+  border: 3px solid #000;
+  border-radius: 6px;
+  padding: 16px;
+  width: 320px;
+}
+.panel h2 { margin: 0 0 10px; font-size: 22px; }
+
+.row { display: flex; gap: 10px; margin: 10px 0; flex-wrap: wrap; }
+
+.stat {
+  flex: 1;
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 6px;
+  padding: 8px;
+  text-align: center;
+  min-width: 80px;
+}
+.stat .label { font-size: 13px; }
+.stat .value { font-size: 24px; font-weight: 800; }
+
+.turn-badge {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 800;
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 8px;
+}
+
+button.btn {
+  border: 2.5px solid #000;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #000;
+  background: #fff;
+  flex: 1;
+  min-width: 80px;
+}
+/* 主要動作用實心黑，最醒目 */
+button.btn.green { background: #000; color: #fff; }
+button.btn:disabled { color: #999; border-color: #999; cursor: not-allowed; }
+button.btn.reset { width: 100%; margin-top: 10px; font-size: 14px; }
+
+select {
+  width: 100%;
+  padding: 11px;
+  border-radius: 8px;
+  border: 2.5px solid #000;
+  font-size: 16px;
+  font-weight: 600;
+  background: #fff;
+  color: #000;
+}
+
+.status {
+  min-height: 24px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 2px solid #000;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  background: #fff;
+}
+/* 用邊框粗細＋底紋區分，不靠顏色 */
+.status.ok { background: #fff; border-width: 3px; }
+.status.warn { background: #eee; }
+
+.score { margin-top: 8px; font-size: 14px; text-align: center; }
+
+/* 練習頁 */
+.prob-title { margin: 0 0 8px; font-size: 21px; font-weight: 800; }
+.prob-desc { font-size: 16px; line-height: 1.7; }
+.hint {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 2px dashed #000;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 15px;
+  display: none;
+}
+.hint.show { display: block; }
+.progress { text-align: center; font-weight: 700; margin: 6px 0; font-size: 16px; }
+
+/* 星星關卡列 */
+.stars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin: 8px 0 12px;
+}
+.star {
+  width: 34px;
+  height: 34px;
+  border: 2px solid #000;
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  background: #fff;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.star.done { background: #000; color: #fff; }        /* 過關：實心黑底白星 */
+.star.current { border-width: 4px; }                  /* 目前關：粗框 */
+
+footer { text-align: center; font-size: 13px; padding: 10px; }
+
+/* 明確關閉任何可能殘留的動畫（墨水裝置不適合） */
+canvas.celebrate { animation: none !important; }

@@ -10,7 +10,7 @@
     this.ui = ui;   // { canvas, turnEl, capBlackEl, capWhiteEl, statusEl,
                     //   modeSel, undoBtn, passBtn, resignBtn, restartBtn, scoreEl }
     this.engine = new global.GoEngine(13);
-    this.renderer = new global.BoardRenderer(ui.canvas, this.engine);
+    this.renderer = new global.BoardRenderer(ui.canvas, this.engine, { eink: !!ui.eink });
     this.ai = new global.GoAI(this.engine);
     this.mode = 'ai';        // 'ai' | 'human'
     this.aiColor = W;        // 電腦執白，玩家執黑先

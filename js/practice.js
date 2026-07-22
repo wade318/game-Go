@@ -247,7 +247,7 @@
   function PracticeController(ui) {
     this.ui = ui;               // { canvas, titleEl, descEl, hintEl, statusEl, prevBtn, nextBtn, retryBtn, progressEl, starsEl }
     this.engine = new global.GoEngine(13);
-    this.renderer = new global.BoardRenderer(ui.canvas, this.engine);
+    this.renderer = new global.BoardRenderer(ui.canvas, this.engine, { eink: !!ui.eink });
     this.index = 0;
     this.solved = false;
     this.store = this.loadStore();   // { 題目id: true } 已過關紀錄
@@ -287,7 +287,7 @@
       var s = document.createElement('button');
       var done = !!this.store[PROBLEMS[i].id];
       s.className = 'star' + (done ? ' done' : '') + (i === this.index ? ' current' : '');
-      s.textContent = done ? '⭐' : (i + 1);
+      s.textContent = done ? (this.ui.eink ? '★' : '⭐') : (i + 1);
       s.title = PROBLEMS[i].title;
       (function (idx) { s.addEventListener('click', function () { self.load(idx); }); })(i);
       el.appendChild(s);

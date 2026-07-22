@@ -36,15 +36,26 @@
 
 平板加到主畫面：用瀏覽器開啟後 →「分享 → 加入主畫面」，就像一個 App。
 
+### 📖 墨水閱讀器版
+
+給 Kindle / Boox / reMarkable 等 e-ink 裝置的專屬版本：[`澂澂的圍棋時光屋-墨水版.html`](澂澂的圍棋時光屋-墨水版.html)
+
+- 純黑白高對比、實心棋子、無漸層
+- **關閉所有動畫、特效、音效**，避免 e-ink 慢刷新造成殘影閃爍
+- 落子不做滑鼠預覽（減少重繪）、允許縮放以利閱讀
+- 同樣支援對戰與 13 關練習、星星進度
+
 ## 🛠 開發（多檔版）
 
 ```
-index.html          主頁（對戰 / 練習分頁）
+index.html          彩色版主頁（對戰 / 練習分頁）
+index-eink.html     墨水版主頁（不載入 fx.js）
 css/style.css       童趣配色樣式
+css/style-eink.css  墨水版灰階高對比樣式
 js/engine.js        圍棋規則核心（氣、提子、禁著、打劫、數子）
-js/render.js        Canvas 棋盤繪製
+js/render.js        Canvas 棋盤繪製（支援 { eink: true } 墨水模式）
 js/ai.js            低段位電腦對手
-js/fx.js            過關 / 吃子特效
+js/fx.js            過關 / 吃子特效（墨水版不載入）
 js/vs.js            對戰控制
 js/practice.js      棋形練習與題庫
 icon-180.png        App 圖示
