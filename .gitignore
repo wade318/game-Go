@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+
+# 編輯器
+.vscode/
+.idea/
+
+# 產生的圖示中間檔（保留 icon-180.png）
+icon-512.png
+icon_b64.txt
+
+# 暫存驗證檔
+_verify_*.html
+_capfx_*.html

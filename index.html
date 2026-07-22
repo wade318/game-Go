@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>澂澂的圍棋時光屋 · 13 路棋盤</title>
+  <link rel="icon" type="image/png" href="icon-180.png">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>🐣 澂澂的<span class="go">圍棋</span>時光屋 🎯</h1>
+    <p>13 路棋盤 · 澂澂專屬的圍棋入門樂園</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-page="vs">⚔️ 對戰</button>
+    <button class="tab" data-page="practice">🧩 棋形練習</button>
+  </div>
+
+  <!-- ===== 對戰頁 ===== -->
+  <section id="page-vs" class="page active">
+    <div class="layout">
+      <div class="board-wrap">
+        <canvas id="vs-canvas" width="560" height="560"></canvas>
+      </div>
+      <div class="panel">
+        <h2>⚔️ 對戰</h2>
+        <select id="vs-mode">
+          <option value="ai">🤖 我 vs 電腦（適合練習）</option>
+          <option value="human">👫 兩個人一起下</option>
+        </select>
+
+        <div class="turn-badge">輪到：<span id="vs-turn">⚫ 黑棋</span></div>
+
+        <div class="row">
+          <div class="stat">
+            <div class="label">⚫ 黑吃掉</div>
+            <div class="value" id="vs-cap-black">0</div>
+          </div>
+          <div class="stat">
+            <div class="label">⚪ 白吃掉</div>
+            <div class="value" id="vs-cap-white">0</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <button class="btn gray" id="vs-undo">↩️ 悔棋</button>
+          <button class="btn" id="vs-pass">⏭️ 虛手</button>
+        </div>
+        <div class="row">
+          <button class="btn red" id="vs-resign">🏳️ 認輸</button>
+          <button class="btn green" id="vs-restart">🔄 重新開始</button>
+        </div>
+
+        <div class="status" id="vs-status"></div>
+        <div class="score" id="vs-score"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 練習頁 ===== -->
+  <section id="page-practice" class="page">
+    <div class="layout">
+      <div class="board-wrap">
+        <canvas id="pr-canvas" width="560" height="560"></canvas>
+      </div>
+      <div class="panel">
+        <div class="progress" id="pr-progress">進度 1 / 13</div>
+        <div class="stars" id="pr-stars"></div>
+        <h3 class="prob-title" id="pr-title">題目</h3>
+        <p class="prob-desc" id="pr-desc">說明</p>
+        <div class="hint" id="pr-hint"></div>
+        <div class="status" id="pr-status"></div>
+        <div class="row">
+          <button class="btn gray" id="pr-prev">⬅️ 上一題</button>
+          <button class="btn" id="pr-retry">🔁 重做</button>
+          <button class="btn green" id="pr-next">下一題 ➡️</button>
+        </div>
+        <button class="btn gray reset" id="pr-reset">🧹 清除星星 重新挑戰</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>用滑鼠或手指點棋盤上的交叉點就能落子 · 黑棋先下</footer>
+
+  <script src="js/engine.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/fx.js"></script>
+  <script src="js/vs.js"></script>
+  <script src="js/practice.js"></script>
+  <script>
+    // 分頁切換
+    var tabs = document.querySelectorAll('.tab');
+    tabs.forEach(function (t) {
+      t.addEventListener('click', function () {
+        tabs.forEach(function (x) { x.classList.remove('active'); });
+        t.classList.add('active');
+        document.querySelectorAll('.page').forEach(function (p) { p.classList.remove('active'); });
+        document.getElementById('page-' + t.dataset.page).classList.add('active');
+      });
+    });
+
+    // 啟動對戰
+    var vs = new VsController({
+      canvas: document.getElementById('vs-canvas'),
+      turnEl: document.getElementById('vs-turn'),
+      capBlackEl: document.getElementById('vs-cap-black'),
+      capWhiteEl: document.getElementById('vs-cap-white'),
+      statusEl: document.getElementById('vs-status'),
+      scoreEl: document.getElementById('vs-score'),
+      modeSel: document.getElementById('vs-mode'),
+      undoBtn: document.getElementById('vs-undo'),
+      passBtn: document.getElementById('vs-pass'),
+      resignBtn: document.getElementById('vs-resign'),
+      restartBtn: document.getElementById('vs-restart')
+    });
+
+    // 啟動練習
+    var practice = new PracticeController({
+      canvas: document.getElementById('pr-canvas'),
+      titleEl: document.getElementById('pr-title'),
+      descEl: document.getElementById('pr-desc'),
+      hintEl: document.getElementById('pr-hint'),
+      statusEl: document.getElementById('pr-status'),
+      progressEl: document.getElementById('pr-progress'),
+      starsEl: document.getElementById('pr-stars'),
+      prevBtn: document.getElementById('pr-prev'),
+      nextBtn: document.getElementById('pr-next'),
+      retryBtn: document.getElementById('pr-retry'),
+      resetBtn: document.getElementById('pr-reset')
+    });
+  </script>
+</body>
+</html>

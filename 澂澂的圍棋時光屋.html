@@ -1,0 +1,1814 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>澂澂的圍棋時光屋 · 13 路棋盤</title>
+  <link rel="icon" type="image/png" href="data:image/png;base64,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">
+  <link rel="apple-touch-icon" href="data:image/png;base64,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">
+  <style>
+:root {
+  --red: #ff5252;
+  --red-dark: #e53935;
+  --wood: #f3b95f;
+  --cream: #fff8ec;
+  --ink: #3a2a16;
+  --green: #43b581;
+  --blue: #4aa3ff;
+  --shadow: 0 4px 0 rgba(0,0,0,.15);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+  background: radial-gradient(circle at 30% 0%, #fff6df 0%, #ffe9c2 60%, #ffd99a 100%);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+header {
+  text-align: center;
+  padding: 18px 12px 6px;
+}
+header h1 {
+  margin: 0;
+  font-size: 30px;
+  letter-spacing: 2px;
+}
+header h1 .go { color: var(--red); }
+header p { margin: 4px 0 0; font-size: 14px; opacity: .7; }
+
+/* 模式分頁 */
+.tabs {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 14px 0 6px;
+  flex-wrap: wrap;
+}
+.tab {
+  border: none;
+  background: #fff;
+  color: var(--ink);
+  font-size: 17px;
+  font-weight: 700;
+  padding: 10px 22px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform .08s, background .15s;
+}
+.tab:active { transform: translateY(2px); }
+.tab.active { background: var(--red); color: #fff; }
+
+/* 版面 */
+.page { display: none; padding: 10px 14px 40px; }
+.page.active { display: block; }
+
+.layout {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.board-wrap {
+  background: #fff;
+  padding: 12px;
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+}
+canvas {
+  display: block;
+  border-radius: 10px;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform .1s;
+}
+canvas.celebrate { animation: pop .5s ease; }
+@keyframes pop {
+  0%,100% { transform: scale(1); }
+  30% { transform: scale(1.03) rotate(-1deg); }
+  60% { transform: scale(1.03) rotate(1deg); }
+}
+
+/* 側欄面板 */
+.panel {
+  background: var(--cream);
+  border-radius: 18px;
+  padding: 18px;
+  width: 300px;
+  box-shadow: var(--shadow);
+}
+.panel h2 { margin: 0 0 10px; font-size: 20px; }
+
+.row {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+  flex-wrap: wrap;
+}
+
+.stat {
+  flex: 1;
+  background: #fff;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  min-width: 80px;
+}
+.stat .label { font-size: 12px; opacity: .65; }
+.stat .value { font-size: 22px; font-weight: 800; }
+
+.turn-badge {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 800;
+  background: #fff;
+  border-radius: 12px;
+  padding: 10px;
+  margin-bottom: 8px;
+}
+
+button.btn {
+  border: none;
+  border-radius: 12px;
+  padding: 11px 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #fff;
+  background: var(--blue);
+  box-shadow: var(--shadow);
+  flex: 1;
+  min-width: 78px;
+  transition: transform .08s, filter .15s;
+}
+button.btn:active { transform: translateY(2px); }
+button.btn:disabled { background: #c9c4bb; cursor: not-allowed; box-shadow: none; }
+button.btn.red { background: var(--red); }
+button.btn.green { background: var(--green); }
+button.btn.gray { background: #8a8577; }
+
+select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 12px;
+  border: 2px solid #e6ddc9;
+  font-size: 15px;
+  font-weight: 600;
+  background: #fff;
+  color: var(--ink);
+}
+
+.status {
+  min-height: 24px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  background: #fff;
+}
+.status.ok { background: #e5f8ee; color: #1e7d52; }
+.status.warn { background: #fff3e0; color: #b26a00; }
+
+.score { margin-top: 8px; font-size: 13px; opacity: .7; text-align: center; }
+
+/* 練習頁 */
+.prob-title { margin: 0 0 8px; font-size: 20px; color: var(--red-dark); }
+.prob-desc { font-size: 15px; line-height: 1.6; }
+.hint {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #fff7d6;
+  color: #8a6d00;
+  font-size: 14px;
+  display: none;
+}
+.hint.show { display: block; }
+.progress { text-align: center; font-weight: 700; margin: 6px 0; opacity: .7; }
+
+/* 星星關卡列 */
+.stars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: center;
+  margin: 8px 0 12px;
+}
+.star {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  background: #ece5d5;
+  color: #a89a7c;
+  box-shadow: 0 2px 0 rgba(0,0,0,.1);
+  transition: transform .08s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.star:active { transform: translateY(2px); }
+.star.done { background: #ffe9a8; color: #d99b00; }
+.star.current { outline: 3px solid var(--red); outline-offset: 1px; }
+
+.btn.reset {
+  width: 100%;
+  margin-top: 10px;
+  font-size: 13px;
+  background: #b8b0a0;
+}
+
+/* ===== 過關特效 ===== */
+.fx-banner {
+  position: fixed;
+  left: 50%;
+  top: 38%;
+  transform: translate(-50%, -50%) scale(0.2);
+  z-index: 9999;
+  pointer-events: none;
+  font-size: 42px;
+  font-weight: 900;
+  color: #fff;
+  text-align: center;
+  padding: 18px 34px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #ff5252, #ff8a3d);
+  box-shadow: 0 12px 40px rgba(0,0,0,.3), 0 0 0 6px rgba(255,255,255,.6);
+  opacity: 0;
+  white-space: nowrap;
+  text-shadow: 0 3px 0 rgba(0,0,0,.15);
+}
+.fx-banner .sub { font-size: 26px; display: block; margin-top: 4px; }
+.fx-banner.big {
+  font-size: 54px;
+  background: linear-gradient(135deg, #ff3b6b, #ffb300 60%, #43d17a);
+}
+.fx-banner.show {
+  animation: fxpop .6s cubic-bezier(.2,1.6,.4,1) forwards;
+}
+.fx-banner.out {
+  animation: fxout .6s ease forwards;
+}
+@keyframes fxpop {
+  0%   { opacity: 0; transform: translate(-50%,-50%) scale(.2) rotate(-12deg); }
+  60%  { opacity: 1; transform: translate(-50%,-50%) scale(1.15) rotate(4deg); }
+  80%  { transform: translate(-50%,-50%) scale(.95) rotate(-2deg); }
+  100% { opacity: 1; transform: translate(-50%,-50%) scale(1) rotate(0); }
+}
+@keyframes fxout {
+  0%   { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%,-140%) scale(.7); }
+}
+
+@keyframes fxshake {
+  0%,100% { transform: translate(0,0) rotate(0); }
+  20% { transform: translate(-6px,3px) rotate(-1.5deg); }
+  40% { transform: translate(6px,-3px) rotate(1.5deg); }
+  60% { transform: translate(-5px,-2px) rotate(-1deg); }
+  80% { transform: translate(5px,2px) rotate(1deg); }
+}
+.fx-shake { animation: fxshake .45s ease; }
+@keyframes fxshakebig {
+  0%,100% { transform: translate(0,0) rotate(0); }
+  15% { transform: translate(-10px,5px) rotate(-2.5deg); }
+  30% { transform: translate(10px,-5px) rotate(2.5deg); }
+  45% { transform: translate(-9px,-4px) rotate(-2deg); }
+  60% { transform: translate(9px,4px) rotate(2deg); }
+  75% { transform: translate(-6px,3px) rotate(-1deg); }
+}
+.fx-shake-big { animation: fxshakebig .7s ease; }
+
+footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
+
+@media (max-width: 720px) {
+  .panel { width: 100%; max-width: 420px; }
+}
+
+</style>
+</head>
+<body>
+  <header>
+    <h1>🐣 澂澂的<span class="go">圍棋</span>時光屋 🎯</h1>
+    <p>13 路棋盤 · 澂澂專屬的圍棋入門樂園</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-page="vs">⚔️ 對戰</button>
+    <button class="tab" data-page="practice">🧩 棋形練習</button>
+  </div>
+
+  <!-- ===== 對戰頁 ===== -->
+  <section id="page-vs" class="page active">
+    <div class="layout">
+      <div class="board-wrap">
+        <canvas id="vs-canvas" width="560" height="560"></canvas>
+      </div>
+      <div class="panel">
+        <h2>⚔️ 對戰</h2>
+        <select id="vs-mode">
+          <option value="ai">🤖 我 vs 電腦（適合練習）</option>
+          <option value="human">👫 兩個人一起下</option>
+        </select>
+
+        <div class="turn-badge">輪到：<span id="vs-turn">⚫ 黑棋</span></div>
+
+        <div class="row">
+          <div class="stat">
+            <div class="label">⚫ 黑吃掉</div>
+            <div class="value" id="vs-cap-black">0</div>
+          </div>
+          <div class="stat">
+            <div class="label">⚪ 白吃掉</div>
+            <div class="value" id="vs-cap-white">0</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <button class="btn gray" id="vs-undo">↩️ 悔棋</button>
+          <button class="btn" id="vs-pass">⏭️ 虛手</button>
+        </div>
+        <div class="row">
+          <button class="btn red" id="vs-resign">🏳️ 認輸</button>
+          <button class="btn green" id="vs-restart">🔄 重新開始</button>
+        </div>
+
+        <div class="status" id="vs-status"></div>
+        <div class="score" id="vs-score"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 練習頁 ===== -->
+  <section id="page-practice" class="page">
+    <div class="layout">
+      <div class="board-wrap">
+        <canvas id="pr-canvas" width="560" height="560"></canvas>
+      </div>
+      <div class="panel">
+        <div class="progress" id="pr-progress">進度 1 / 13</div>
+        <div class="stars" id="pr-stars"></div>
+        <h3 class="prob-title" id="pr-title">題目</h3>
+        <p class="prob-desc" id="pr-desc">說明</p>
+        <div class="hint" id="pr-hint"></div>
+        <div class="status" id="pr-status"></div>
+        <div class="row">
+          <button class="btn gray" id="pr-prev">⬅️ 上一題</button>
+          <button class="btn" id="pr-retry">🔁 重做</button>
+          <button class="btn green" id="pr-next">下一題 ➡️</button>
+        </div>
+        <button class="btn gray reset" id="pr-reset">🧹 清除星星 重新挑戰</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>用滑鼠或手指點棋盤上的交叉點就能落子 · 黑棋先下</footer>
+
+  <script>
+/* 圍棋規則核心引擎 —— 13 路棋盤
+   負責：落子、氣的計算、提子、禁著點(自殺)、打劫(簡易 ko)
+   不含任何畫面邏輯，方便對戰與練習共用 */
+
+(function (global) {
+  'use strict';
+
+  var EMPTY = 0;
+  var BLACK = 1;
+  var WHITE = 2;
+
+  function GoEngine(size) {
+    this.size = size || 13;
+    this.reset();
+  }
+
+  GoEngine.EMPTY = EMPTY;
+  GoEngine.BLACK = BLACK;
+  GoEngine.WHITE = WHITE;
+
+  GoEngine.prototype.reset = function () {
+    var n = this.size;
+    this.board = [];
+    for (var y = 0; y < n; y++) {
+      var row = [];
+      for (var x = 0; x < n; x++) row.push(EMPTY);
+      this.board.push(row);
+    }
+    this.turn = BLACK;            // 黑先
+    this.captures = { 1: 0, 2: 0 }; // 各方提子數
+    this.koPoint = null;         // 打劫禁著點 {x,y}
+    this.history = [];           // 每步快照，供悔棋
+    this.lastMove = null;
+    this.passes = 0;
+  };
+
+  GoEngine.prototype.inBounds = function (x, y) {
+    return x >= 0 && y >= 0 && x < this.size && y < this.size;
+  };
+
+  GoEngine.prototype.get = function (x, y) {
+    return this.board[y][x];
+  };
+
+  GoEngine.prototype.opponent = function (color) {
+    return color === BLACK ? WHITE : BLACK;
+  };
+
+  // 取得某顆棋子所屬的整塊(相連同色) + 這塊的氣
+  GoEngine.prototype.groupAndLiberties = function (x, y) {
+    var color = this.board[y][x];
+    var stones = [];
+    var liberties = {};
+    var seen = {};
+    var stack = [[x, y]];
+    seen[x + ',' + y] = true;
+    var dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+    while (stack.length) {
+      var cur = stack.pop();
+      var cx = cur[0], cy = cur[1];
+      stones.push({ x: cx, y: cy });
+      for (var i = 0; i < 4; i++) {
+        var nx = cx + dirs[i][0], ny = cy + dirs[i][1];
+        if (!this.inBounds(nx, ny)) continue;
+        var v = this.board[ny][nx];
+        if (v === EMPTY) {
+          liberties[nx + ',' + ny] = true;
+        } else if (v === color && !seen[nx + ',' + ny]) {
+          seen[nx + ',' + ny] = true;
+          stack.push([nx, ny]);
+        }
+      }
+    }
+    return { stones: stones, liberties: Object.keys(liberties).length };
+  };
+
+  // 計算某座標若有棋子的氣數（不改動棋盤）
+  GoEngine.prototype.libertiesAt = function (x, y) {
+    if (this.board[y][x] === EMPTY) return 0;
+    return this.groupAndLiberties(x, y).liberties;
+  };
+
+  // 試落子，回傳結果物件而不修改棋盤（供 AI / 練習判斷）
+  // { legal, reason, captured:[{x,y}...] }
+  GoEngine.prototype.tryPlay = function (x, y, color) {
+    if (!this.inBounds(x, y)) return { legal: false, reason: 'out' };
+    if (this.board[y][x] !== EMPTY) return { legal: false, reason: 'occupied' };
+    if (this.koPoint && this.koPoint.x === x && this.koPoint.y === y) {
+      return { legal: false, reason: 'ko' };
+    }
+
+    var opp = this.opponent(color);
+    var dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+
+    // 暫放
+    this.board[y][x] = color;
+    var captured = [];
+    var capKeys = {};
+
+    // 檢查四鄰敵子是否被提
+    for (var i = 0; i < 4; i++) {
+      var nx = x + dirs[i][0], ny = y + dirs[i][1];
+      if (!this.inBounds(nx, ny)) continue;
+      if (this.board[ny][nx] === opp) {
+        var g = this.groupAndLiberties(nx, ny);
+        if (g.liberties === 0) {
+          for (var j = 0; j < g.stones.length; j++) {
+            var s = g.stones[j];
+            var k = s.x + ',' + s.y;
+            if (!capKeys[k]) { capKeys[k] = true; captured.push(s); }
+          }
+        }
+      }
+    }
+
+    // 若沒提到子，檢查自己是否有氣（禁自殺）
+    if (captured.length === 0) {
+      var self = this.groupAndLiberties(x, y);
+      if (self.liberties === 0) {
+        this.board[y][x] = EMPTY; // 還原
+        return { legal: false, reason: 'suicide' };
+      }
+    }
+
+    this.board[y][x] = EMPTY; // 還原（tryPlay 不改棋盤）
+    return { legal: true, captured: captured };
+  };
+
+  // 正式落子；成功回傳 true
+  GoEngine.prototype.play = function (x, y) {
+    var color = this.turn;
+    var res = this.tryPlay(x, y, color);
+    if (!res.legal) return res;
+
+    this.pushHistory();
+
+    var opp = this.opponent(color);
+    this.board[y][x] = color;
+    for (var i = 0; i < res.captured.length; i++) {
+      var c = res.captured[i];
+      this.board[c.y][c.x] = EMPTY;
+    }
+    this.captures[color] += res.captured.length;
+
+    // 簡易打劫：只提 1 子、且自身也只有 1 氣時，設禁著點
+    if (res.captured.length === 1) {
+      var self = this.groupAndLiberties(x, y);
+      if (self.liberties === 1 && self.stones.length === 1) {
+        this.koPoint = { x: res.captured[0].x, y: res.captured[0].y };
+      } else {
+        this.koPoint = null;
+      }
+    } else {
+      this.koPoint = null;
+    }
+
+    this.lastMove = { x: x, y: y, color: color };
+    this.turn = opp;
+    this.passes = 0;
+    return { legal: true, captured: res.captured };
+  };
+
+  GoEngine.prototype.pass = function () {
+    this.pushHistory();
+    this.koPoint = null;
+    this.lastMove = null;
+    this.passes += 1;
+    this.turn = this.opponent(this.turn);
+    return this.passes >= 2; // 連續兩 pass 即終局
+  };
+
+  GoEngine.prototype.pushHistory = function () {
+    this.history.push({
+      board: this.board.map(function (r) { return r.slice(); }),
+      turn: this.turn,
+      captures: { 1: this.captures[1], 2: this.captures[2] },
+      koPoint: this.koPoint ? { x: this.koPoint.x, y: this.koPoint.y } : null,
+      lastMove: this.lastMove
+    });
+  };
+
+  GoEngine.prototype.undo = function () {
+    if (!this.history.length) return false;
+    var s = this.history.pop();
+    this.board = s.board.map(function (r) { return r.slice(); });
+    this.turn = s.turn;
+    this.captures = { 1: s.captures[1], 2: s.captures[2] };
+    this.koPoint = s.koPoint;
+    this.lastMove = s.lastMove;
+    this.passes = 0;
+    return true;
+  };
+
+  // 找出所有合法落子點（給 AI 用）
+  GoEngine.prototype.legalMoves = function (color) {
+    var moves = [];
+    for (var y = 0; y < this.size; y++) {
+      for (var x = 0; x < this.size; x++) {
+        if (this.board[y][x] !== EMPTY) continue;
+        var r = this.tryPlay(x, y, color);
+        if (r.legal) moves.push({ x: x, y: y, captured: r.captured.length });
+      }
+    }
+    return moves;
+  };
+
+  // 簡易數子(面積法)：空點若只被單一顏色包圍算該方地
+  // 兒童版粗略估算，回傳 { black, white }
+  GoEngine.prototype.scoreEstimate = function () {
+    var n = this.size;
+    var visited = {};
+    var territory = { 1: 0, 2: 0 };
+    var stoneCount = { 1: 0, 2: 0 };
+    var dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+
+    for (var y = 0; y < n; y++) {
+      for (var x = 0; x < n; x++) {
+        var v = this.board[y][x];
+        if (v === BLACK) stoneCount[1]++;
+        else if (v === WHITE) stoneCount[2]++;
+        else {
+          var key = x + ',' + y;
+          if (visited[key]) continue;
+          // flood fill 這塊空地
+          var region = [];
+          var borders = {};
+          var stack = [[x, y]];
+          visited[key] = true;
+          while (stack.length) {
+            var c = stack.pop();
+            region.push(c);
+            for (var i = 0; i < 4; i++) {
+              var nx = c[0] + dirs[i][0], ny = c[1] + dirs[i][1];
+              if (!this.inBounds(nx, ny)) continue;
+              var nv = this.board[ny][nx];
+              if (nv === EMPTY) {
+                var nk = nx + ',' + ny;
+                if (!visited[nk]) { visited[nk] = true; stack.push([nx, ny]); }
+              } else {
+                borders[nv] = true;
+              }
+            }
+          }
+          if (borders[BLACK] && !borders[WHITE]) territory[1] += region.length;
+          else if (borders[WHITE] && !borders[BLACK]) territory[2] += region.length;
+        }
+      }
+    }
+    return {
+      black: stoneCount[1] + territory[1],
+      white: stoneCount[2] + territory[2],
+      blackTerritory: territory[1],
+      whiteTerritory: territory[2]
+    };
+  };
+
+  // 由外部佈局（練習題用）：stones = [{x,y,color}], turn
+  GoEngine.prototype.setup = function (stones, turn) {
+    this.reset();
+    for (var i = 0; i < stones.length; i++) {
+      var s = stones[i];
+      this.board[s.y][s.x] = s.color;
+    }
+    this.turn = turn || BLACK;
+    this.history = [];
+  };
+
+  global.GoEngine = GoEngine;
+})(window);
+
+</script>
+  <script>
+/* Canvas 棋盤繪製器 —— 童趣木紋棋盤、立體棋子、星位、最後一手標記
+   對外：new BoardRenderer(canvas, engine, options)
+        .draw()           重繪
+        .onPoint(cb)      註冊點擊格點回呼 (x,y)
+        .setMarks(arr)    設定額外標記（練習提示用） */
+
+(function (global) {
+  'use strict';
+
+  var BLACK = 1, WHITE = 2, EMPTY = 0;
+
+  function BoardRenderer(canvas, engine, options) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.engine = engine;
+    this.opts = options || {};
+    this.marks = [];          // [{x,y,type:'circle|triangle|square|dot', color, text}]
+    this.ghost = null;        // 滑鼠預覽落子點
+    this.pointCb = null;
+    this._bindEvents();
+    this.resize();
+  }
+
+  BoardRenderer.prototype.resize = function () {
+    // 依 CSS 尺寸配置高解析度畫布
+    var rect = this.canvas.getBoundingClientRect();
+    var px = Math.max(300, Math.min(rect.width || 560, 640));
+    var dpr = global.devicePixelRatio || 1;
+    this.pixel = px;
+    this.canvas.width = px * dpr;
+    this.canvas.height = px * dpr;
+    this.canvas.style.width = px + 'px';
+    this.canvas.style.height = px + 'px';
+    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    var n = this.engine.size;
+    this.pad = px * 0.06 + 8;          // 邊距（留座標）
+    this.grid = (px - this.pad * 2) / (n - 1);
+    this.stoneR = this.grid * 0.46;
+    this.draw();
+  };
+
+  BoardRenderer.prototype._bindEvents = function () {
+    var self = this;
+    this.canvas.addEventListener('click', function (e) {
+      var p = self._eventToGrid(e);
+      if (p && self.pointCb) self.pointCb(p.x, p.y);
+    });
+    this.canvas.addEventListener('mousemove', function (e) {
+      var p = self._eventToGrid(e);
+      var changed = (!!p !== !!self.ghost) ||
+        (p && self.ghost && (p.x !== self.ghost.x || p.y !== self.ghost.y));
+      self.ghost = p;
+      if (changed) self.draw();
+    });
+    this.canvas.addEventListener('mouseleave', function () {
+      if (self.ghost) { self.ghost = null; self.draw(); }
+    });
+  };
+
+  BoardRenderer.prototype._eventToGrid = function (e) {
+    var rect = this.canvas.getBoundingClientRect();
+    var mx = e.clientX - rect.left;
+    var my = e.clientY - rect.top;
+    var gx = Math.round((mx - this.pad) / this.grid);
+    var gy = Math.round((my - this.pad) / this.grid);
+    if (gx < 0 || gy < 0 || gx >= this.engine.size || gy >= this.engine.size) return null;
+    // 只在靠近格點時有效
+    var cx = this.pad + gx * this.grid;
+    var cy = this.pad + gy * this.grid;
+    if (Math.hypot(mx - cx, my - cy) > this.grid * 0.5) return null;
+    return { x: gx, y: gy };
+  };
+
+  BoardRenderer.prototype.onPoint = function (cb) { this.pointCb = cb; };
+  BoardRenderer.prototype.setMarks = function (arr) { this.marks = arr || []; this.draw(); };
+
+  BoardRenderer.prototype._starPoints = function () {
+    var n = this.engine.size;
+    if (n === 13) return [[3, 3], [9, 3], [6, 6], [3, 9], [9, 9]];
+    if (n === 9) return [[2, 2], [6, 2], [4, 4], [2, 6], [6, 6]];
+    if (n === 19) return [[3, 3], [9, 3], [15, 3], [3, 9], [9, 9], [15, 9], [3, 15], [9, 15], [15, 15]];
+    return [];
+  };
+
+  BoardRenderer.prototype.cx = function (x) { return this.pad + x * this.grid; };
+  BoardRenderer.prototype.cy = function (y) { return this.pad + y * this.grid; };
+
+  BoardRenderer.prototype.draw = function () {
+    var ctx = this.ctx, n = this.engine.size, px = this.pixel;
+
+    // 木紋底
+    var g = ctx.createLinearGradient(0, 0, px, px);
+    g.addColorStop(0, '#f5c877');
+    g.addColorStop(1, '#e8a94e');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, px, px);
+
+    // 格線
+    ctx.strokeStyle = '#5a3a1a';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    for (var i = 0; i < n; i++) {
+      ctx.moveTo(this.cx(0), this.cy(i)); ctx.lineTo(this.cx(n - 1), this.cy(i));
+      ctx.moveTo(this.cx(i), this.cy(0)); ctx.lineTo(this.cx(i), this.cy(n - 1));
+    }
+    ctx.stroke();
+
+    // 座標標示（A.. / 1..）
+    ctx.fillStyle = '#6b4a24';
+    ctx.font = Math.max(9, this.grid * 0.32) + 'px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    var letters = 'ABCDEFGHJKLMNOPQRST';
+    for (var c = 0; c < n; c++) {
+      ctx.fillText(letters[c], this.cx(c), this.pad - this.grid * 0.55);
+      ctx.fillText(String(n - c), this.pad - this.grid * 0.6, this.cy(c));
+    }
+
+    // 星位
+    var stars = this._starPoints();
+    ctx.fillStyle = '#5a3a1a';
+    for (var s = 0; s < stars.length; s++) {
+      ctx.beginPath();
+      ctx.arc(this.cx(stars[s][0]), this.cy(stars[s][1]), Math.max(2.5, this.grid * 0.08), 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // 落子預覽
+    if (this.ghost && this.engine.get(this.ghost.x, this.ghost.y) === EMPTY) {
+      this._drawStone(this.ghost.x, this.ghost.y, this.engine.turn, 0.35);
+    }
+
+    // 棋子
+    for (var y = 0; y < n; y++) {
+      for (var x = 0; x < n; x++) {
+        var v = this.engine.board[y][x];
+        if (v !== EMPTY) this._drawStone(x, y, v, 1);
+      }
+    }
+
+    // 最後一手標記
+    var lm = this.engine.lastMove;
+    if (lm) {
+      ctx.strokeStyle = lm.color === BLACK ? '#ff5252' : '#ff5252';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.arc(this.cx(lm.x), this.cy(lm.y), this.stoneR * 0.5, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    // 練習標記
+    for (var m = 0; m < this.marks.length; m++) this._drawMark(this.marks[m]);
+  };
+
+  BoardRenderer.prototype._drawStone = function (x, y, color, alpha) {
+    var ctx = this.ctx, cx = this.cx(x), cy = this.cy(y), r = this.stoneR;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    // 陰影
+    ctx.beginPath();
+    ctx.arc(cx + 1.5, cy + 2, r, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ctx.fill();
+    // 立體漸層
+    var rg = ctx.createRadialGradient(cx - r * 0.35, cy - r * 0.35, r * 0.1, cx, cy, r);
+    if (color === BLACK) { rg.addColorStop(0, '#666'); rg.addColorStop(1, '#111'); }
+    else { rg.addColorStop(0, '#fff'); rg.addColorStop(1, '#cfcfcf'); }
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fillStyle = rg;
+    ctx.fill();
+    ctx.restore();
+  };
+
+  BoardRenderer.prototype._drawMark = function (m) {
+    var ctx = this.ctx, cx = this.cx(m.x), cy = this.cy(m.y), r = this.stoneR * 0.6;
+    ctx.save();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = m.color || '#ff3b3b';
+    ctx.fillStyle = m.color || '#ff3b3b';
+    if (m.type === 'circle') {
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+    } else if (m.type === 'square') {
+      ctx.strokeRect(cx - r, cy - r, r * 2, r * 2);
+    } else if (m.type === 'triangle') {
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - r); ctx.lineTo(cx - r, cy + r * 0.8); ctx.lineTo(cx + r, cy + r * 0.8);
+      ctx.closePath(); ctx.stroke();
+    } else if (m.type === 'dot') {
+      ctx.beginPath(); ctx.arc(cx, cy, r * 0.55, 0, Math.PI * 2); ctx.fill();
+    } else if (m.type === 'text') {
+      ctx.fillStyle = m.color || '#ff3b3b';
+      ctx.font = 'bold ' + (this.grid * 0.5) + 'px system-ui';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(m.text, cx, cy);
+    }
+    ctx.restore();
+  };
+
+  global.BoardRenderer = BoardRenderer;
+})(window);
+
+</script>
+  <script>
+/* 低段位電腦對手 —— 啟發式，故意「不太強」讓兒童有成就感
+   策略優先序：
+   1. 能吃掉對方（提子）就吃，優先吃多的
+   2. 自己被打吃(剩 1 氣)就逃 / 或反提
+   3. 避免自填(下了自己剩 1 氣的笨手)
+   4. 靠近最後一手或己方棋子附近落子
+   5. 隨機（偏中央） */
+
+(function (global) {
+  'use strict';
+
+  var EMPTY = 0;
+
+  function GoAI(engine) {
+    this.engine = engine;
+  }
+
+  // 計算「若在 (x,y) 落子後，自己這塊的氣」
+  function selfLibertiesAfter(engine, x, y, color) {
+    engine.board[y][x] = color;
+    // 先移除被提的敵子以正確計氣
+    var opp = engine.opponent(color);
+    var dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+    var removed = [];
+    for (var i = 0; i < 4; i++) {
+      var nx = x + dirs[i][0], ny = y + dirs[i][1];
+      if (!engine.inBounds(nx, ny)) continue;
+      if (engine.board[ny][nx] === opp) {
+        var g = engine.groupAndLiberties(nx, ny);
+        if (g.liberties === 0) {
+          for (var j = 0; j < g.stones.length; j++) {
+            removed.push(g.stones[j]);
+            engine.board[g.stones[j].y][g.stones[j].x] = EMPTY;
+          }
+        }
+      }
+    }
+    var libs = engine.groupAndLiberties(x, y).liberties;
+    // 還原
+    engine.board[y][x] = EMPTY;
+    for (var k = 0; k < removed.length; k++) {
+      engine.board[removed[k].y][removed[k].x] = opp;
+    }
+    return libs;
+  }
+
+  GoAI.prototype.chooseMove = function (color) {
+    var e = this.engine;
+    var moves = e.legalMoves(color);
+    if (!moves.length) return null;
+
+    var opp = e.opponent(color);
+    var best = [];
+    var bestScore = -Infinity;
+    var center = (e.size - 1) / 2;
+
+    for (var i = 0; i < moves.length; i++) {
+      var mv = moves[i];
+      var score = 0;
+
+      // 1. 吃子加高分
+      score += mv.captured * 12;
+
+      // 3. 自身氣：落子後自己氣越多越好，避免自填
+      var libs = selfLibertiesAfter(e, mv.x, mv.y, color);
+      if (libs <= 1 && mv.captured === 0) score -= 8;   // 自送打吃，扣分
+      score += Math.min(libs, 4) * 1.2;
+
+      // 2. 打吃對方：落子後讓某鄰接敵塊剩 1 氣，加分
+      var dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+      e.board[mv.y][mv.x] = color;
+      for (var d = 0; d < 4; d++) {
+        var nx = mv.x + dirs[d][0], ny = mv.y + dirs[d][1];
+        if (!e.inBounds(nx, ny)) continue;
+        if (e.board[ny][nx] === opp) {
+          var og = e.groupAndLiberties(nx, ny);
+          if (og.liberties === 1) score += 5;
+        }
+        // 貼近己方或敵方棋子（有互動）
+        if (e.board[ny][nx] !== EMPTY) score += 0.8;
+      }
+      e.board[mv.y][mv.x] = EMPTY;
+
+      // 5. 偏好中央 + 加隨機抖動，避免每盤一樣
+      var distC = Math.abs(mv.x - center) + Math.abs(mv.y - center);
+      score += (e.size - distC) * 0.15;
+      score += Math.random() * 1.5;
+
+      if (score > bestScore) { bestScore = score; best = [mv]; }
+      else if (score === bestScore) best.push(mv);
+    }
+
+    return best[Math.floor(Math.random() * best.length)];
+  };
+
+  global.GoAI = GoAI;
+})(window);
+
+</script>
+  <script>
+/* 過關誇張特效 —— 彩帶爆炸 + 星星煙火 + 大字橫幅 + 震動 + 叮咚音效
+   全部純前端、免網路。對外：window.FX.celebrate({ big: false, text: '過關囉！' }) */
+
+(function (global) {
+  'use strict';
+
+  var canvas, ctx, particles = [], running = false, banner;
+  var COLORS = ['#ff5252', '#ffb300', '#ffe14d', '#43d17a', '#4aa3ff', '#b06bff', '#ff7bd5', '#ff8a3d'];
+  var EMOJIS = ['⭐', '🎉', '✨', '🎈', '🌟', '🏆'];
+
+  function ensureCanvas() {
+    if (canvas) return;
+    canvas = document.createElement('canvas');
+    canvas.style.cssText = 'position:fixed;left:0;top:0;width:100%;height:100%;' +
+      'pointer-events:none;z-index:9998;';
+    document.body.appendChild(canvas);
+    ctx = canvas.getContext('2d');
+    resize();
+    global.addEventListener('resize', resize);
+  }
+
+  function resize() {
+    if (!canvas) return;
+    var dpr = global.devicePixelRatio || 1;
+    canvas.width = global.innerWidth * dpr;
+    canvas.height = global.innerHeight * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function rand(a, b) { return a + Math.random() * (b - a); }
+
+  // 從某點放射爆開
+  function burst(cx, cy, count, power) {
+    for (var i = 0; i < count; i++) {
+      var ang = rand(0, Math.PI * 2);
+      var spd = rand(3, power);
+      var isEmoji = Math.random() < 0.22;
+      particles.push({
+        x: cx, y: cy,
+        vx: Math.cos(ang) * spd,
+        vy: Math.sin(ang) * spd - rand(2, 6),
+        g: rand(0.12, 0.26),
+        rot: rand(0, Math.PI * 2),
+        vr: rand(-0.3, 0.3),
+        life: 0, maxLife: rand(70, 120),
+        size: isEmoji ? rand(18, 30) : rand(6, 13),
+        color: COLORS[(Math.random() * COLORS.length) | 0],
+        emoji: isEmoji ? EMOJIS[(Math.random() * EMOJIS.length) | 0] : null,
+        shape: Math.random() < 0.5 ? 'rect' : 'circle'
+      });
+    }
+  }
+
+  // 從頂端落下的彩帶雨
+  function rain(count) {
+    var w = global.innerWidth;
+    for (var i = 0; i < count; i++) {
+      particles.push({
+        x: rand(0, w), y: rand(-60, -10),
+        vx: rand(-1.5, 1.5), vy: rand(2, 5),
+        g: rand(0.02, 0.06),
+        rot: rand(0, Math.PI * 2), vr: rand(-0.25, 0.25),
+        life: 0, maxLife: rand(120, 200),
+        size: rand(7, 14),
+        color: COLORS[(Math.random() * COLORS.length) | 0],
+        emoji: null,
+        shape: Math.random() < 0.5 ? 'rect' : 'circle',
+        sway: rand(0.02, 0.06), swayPhase: rand(0, 6)
+      });
+    }
+  }
+
+  function loop() {
+    ctx.clearRect(0, 0, global.innerWidth, global.innerHeight);
+    for (var i = particles.length - 1; i >= 0; i--) {
+      var p = particles[i];
+      p.life++;
+      p.vy += p.g;
+      if (p.sway) p.x += Math.sin((p.life * p.sway) + p.swayPhase) * 1.2;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vr;
+      var alpha = p.life > p.maxLife - 25 ? Math.max(0, (p.maxLife - p.life) / 25) : 1;
+
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      if (p.emoji) {
+        ctx.font = p.size + 'px serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(p.emoji, 0, 0);
+      } else if (p.shape === 'rect') {
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+      } else {
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      if (p.life >= p.maxLife || p.y > global.innerHeight + 40) particles.splice(i, 1);
+    }
+    if (particles.length) requestAnimationFrame(loop);
+    else { running = false; ctx.clearRect(0, 0, global.innerWidth, global.innerHeight); }
+  }
+
+  function start() {
+    if (!running) { running = true; requestAnimationFrame(loop); }
+  }
+
+  // 中央大字橫幅：彈跳登場後淡出
+  function showBanner(text, big) {
+    if (banner && banner.parentNode) banner.parentNode.removeChild(banner);
+    banner = document.createElement('div');
+    banner.className = 'fx-banner' + (big ? ' big' : '');
+    banner.innerHTML = text;
+    document.body.appendChild(banner);
+    // 觸發動畫
+    void banner.offsetWidth;
+    banner.classList.add('show');
+    var b = banner;
+    setTimeout(function () { b.classList.add('out'); }, big ? 2000 : 1200);
+    setTimeout(function () { if (b.parentNode) b.parentNode.removeChild(b); }, big ? 2800 : 1900);
+  }
+
+  // 叮咚音效（WebAudio，免檔案）
+  var actx;
+  function chime(big) {
+    try {
+      actx = actx || new (global.AudioContext || global.webkitAudioContext)();
+      var notes = big ? [523, 659, 784, 1047, 1319] : [659, 784, 1047];
+      var t0 = actx.currentTime;
+      notes.forEach(function (f, i) {
+        var o = actx.createOscillator();
+        var g = actx.createGain();
+        o.type = 'triangle';
+        o.frequency.value = f;
+        var st = t0 + i * 0.09;
+        g.gain.setValueAtTime(0.0001, st);
+        g.gain.exponentialRampToValueAtTime(0.25, st + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, st + 0.35);
+        o.connect(g); g.connect(actx.destination);
+        o.start(st); o.stop(st + 0.4);
+      });
+    } catch (e) { /* 靜音環境忽略 */ }
+  }
+
+  // 震動某元素
+  function shake(el, big) {
+    if (!el) return;
+    var cls = big ? 'fx-shake-big' : 'fx-shake';
+    el.classList.remove(cls);
+    void el.offsetWidth;
+    el.classList.add(cls);
+    setTimeout(function () { el.classList.remove(cls); }, big ? 700 : 450);
+  }
+
+  // 吃子小噴發：在螢幕座標 (sx,sy) 噴出一小撮彩帶
+  function miniBurst(sx, sy, count) {
+    ensureCanvas();
+    count = count || 14;
+    for (var i = 0; i < count; i++) {
+      var ang = rand(0, Math.PI * 2);
+      var spd = rand(2, 7);
+      var isEmoji = Math.random() < 0.15;
+      particles.push({
+        x: sx, y: sy,
+        vx: Math.cos(ang) * spd,
+        vy: Math.sin(ang) * spd - rand(0, 3),
+        g: rand(0.12, 0.22),
+        rot: rand(0, Math.PI * 2), vr: rand(-0.3, 0.3),
+        life: 0, maxLife: rand(28, 52),
+        size: isEmoji ? rand(14, 20) : rand(5, 10),
+        color: COLORS[(Math.random() * COLORS.length) | 0],
+        emoji: isEmoji ? '✨' : null,
+        shape: Math.random() < 0.5 ? 'rect' : 'circle'
+      });
+    }
+    start();
+  }
+
+  // 吃子「啵」音效
+  function pop() {
+    try {
+      actx = actx || new (global.AudioContext || global.webkitAudioContext)();
+      var o = actx.createOscillator();
+      var g = actx.createGain();
+      o.type = 'sine';
+      var t = actx.currentTime;
+      o.frequency.setValueAtTime(880, t);
+      o.frequency.exponentialRampToValueAtTime(280, t + 0.12);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.3, t + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
+      o.connect(g); g.connect(actx.destination);
+      o.start(t); o.stop(t + 0.18);
+    } catch (e) { /* 靜音環境忽略 */ }
+  }
+
+  function celebrate(opts) {
+    opts = opts || {};
+    ensureCanvas();
+    var cx = global.innerWidth / 2;
+    var cy = global.innerHeight * 0.42;
+
+    if (opts.big) {
+      burst(cx, cy, 160, 16);
+      rain(120);
+      // 兩側再各補一炮
+      setTimeout(function () { burst(cx * 0.4, cy, 80, 13); burst(cx * 1.6, cy, 80, 13); start(); }, 220);
+      showBanner(opts.text || '🏆 全部通關！🏆<br><span class="sub">澂澂好棒！</span>', true);
+    } else {
+      burst(cx, cy, 90, 13);
+      rain(50);
+      showBanner(opts.text || '🎉 過關囉！ ⭐', false);
+    }
+    start();
+    chime(!!opts.big);
+    shake(opts.shakeEl, !!opts.big);
+  }
+
+  global.FX = { celebrate: celebrate, miniBurst: miniBurst, pop: pop };
+})(window);
+
+</script>
+  <script>
+/* 對戰模式 —— 支援「雙人對戰」與「對電腦(低段位)」
+   功能：輪流落子、顯示提子數、悔棋、虛手(Pass)、認輸、重新開始、終局粗略數子 */
+
+(function (global) {
+  'use strict';
+
+  var B = 1, W = 2;
+
+  function VsController(ui) {
+    this.ui = ui;   // { canvas, turnEl, capBlackEl, capWhiteEl, statusEl,
+                    //   modeSel, undoBtn, passBtn, resignBtn, restartBtn, scoreEl }
+    this.engine = new global.GoEngine(13);
+    this.renderer = new global.BoardRenderer(ui.canvas, this.engine);
+    this.ai = new global.GoAI(this.engine);
+    this.mode = 'ai';        // 'ai' | 'human'
+    this.aiColor = W;        // 電腦執白，玩家執黑先
+    this.gameOver = false;
+    this.thinking = false;
+
+    var self = this;
+    this.renderer.onPoint(function (x, y) { self.handleClick(x, y); });
+    this.bind();
+    this.restart();
+  }
+
+  VsController.prototype.bind = function () {
+    var self = this, ui = this.ui;
+    ui.modeSel.addEventListener('change', function () {
+      self.mode = ui.modeSel.value;
+      self.restart();
+    });
+    ui.undoBtn.addEventListener('click', function () { self.undo(); });
+    ui.passBtn.addEventListener('click', function () { self.pass(); });
+    ui.resignBtn.addEventListener('click', function () { self.resign(); });
+    ui.restartBtn.addEventListener('click', function () { self.restart(); });
+  };
+
+  VsController.prototype.restart = function () {
+    this.engine.reset();
+    this.gameOver = false;
+    this.thinking = false;
+    this.ui.scoreEl.textContent = '';
+    this.renderer.draw();
+    this.refresh();
+    this.setStatus('開始對局！黑棋先下 ⚫', '');
+  };
+
+  VsController.prototype.refresh = function () {
+    var e = this.engine;
+    this.ui.turnEl.textContent = e.turn === B ? '⚫ 黑棋' : '⚪ 白棋';
+    this.ui.capBlackEl.textContent = e.captures[B];
+    this.ui.capWhiteEl.textContent = e.captures[W];
+    this.ui.undoBtn.disabled = this.gameOver || !e.history.length;
+  };
+
+  VsController.prototype.setStatus = function (text, cls) {
+    this.ui.statusEl.textContent = text;
+    this.ui.statusEl.className = 'status ' + (cls || '');
+  };
+
+  VsController.prototype.isAiTurn = function () {
+    return this.mode === 'ai' && this.engine.turn === this.aiColor;
+  };
+
+  VsController.prototype.handleClick = function (x, y) {
+    if (this.gameOver || this.thinking) return;
+    if (this.isAiTurn()) return;   // 電腦回合不接受點擊
+
+    var res = this.engine.play(x, y);
+    if (!res.legal) {
+      this.setStatus('這裡不能下（' + reasonText(res.reason) + '）', 'warn');
+      return;
+    }
+    this.renderer.draw();
+    this.afterMove(res);
+
+    if (!this.gameOver && this.isAiTurn()) this.aiMove();
+  };
+
+  VsController.prototype.afterMove = function (res) {
+    this.refresh();
+    if (res.captured && res.captured.length) {
+      this.setStatus('提子 ' + res.captured.length + ' 顆！', 'ok');
+      this.captureFx(res.captured);
+    } else {
+      this.setStatus('', '');
+    }
+  };
+
+  // 吃子小特效：每顆被提的棋位置噴一撮彩帶 + 啵一聲
+  VsController.prototype.captureFx = function (caps) {
+    if (!global.FX) return;
+    var r = this.renderer;
+    var rect = r.canvas.getBoundingClientRect();
+    for (var i = 0; i < caps.length; i++) {
+      global.FX.miniBurst(rect.left + r.cx(caps[i].x), rect.top + r.cy(caps[i].y), 14);
+    }
+    global.FX.pop();
+  };
+
+  VsController.prototype.aiMove = function () {
+    var self = this;
+    this.thinking = true;
+    this.setStatus('電腦思考中… 🤖', '');
+    setTimeout(function () {
+      var mv = self.ai.chooseMove(self.aiColor);
+      if (!mv) {
+        self.thinking = false;
+        self.pass();
+        return;
+      }
+      var res = self.engine.play(mv.x, mv.y);
+      self.renderer.draw();
+      self.thinking = false;
+      self.afterMove(res);
+    }, 450);
+  };
+
+  VsController.prototype.undo = function () {
+    if (this.gameOver || this.thinking) return;
+    // 對電腦時一次退兩手(退回玩家)，雙人退一手
+    this.engine.undo();
+    if (this.mode === 'ai' && this.engine.turn === this.aiColor) this.engine.undo();
+    this.renderer.draw();
+    this.refresh();
+    this.setStatus('悔棋一步 ↩️', '');
+  };
+
+  VsController.prototype.pass = function () {
+    if (this.gameOver || this.thinking) return;
+    var ended = this.engine.pass();
+    this.renderer.draw();
+    this.refresh();
+    if (ended) {
+      this.endByScore('雙方虛手，對局結束');
+    } else {
+      this.setStatus((this.engine.turn === B ? '黑棋' : '白棋') + '回合（對方虛手 Pass）', '');
+      if (this.isAiTurn()) this.aiMove();
+    }
+  };
+
+  VsController.prototype.resign = function () {
+    if (this.gameOver) return;
+    var loser = this.engine.turn; // 認輸方視為當前回合方(由按鈕方主動)
+    this.gameOver = true;
+    var winner = loser === B ? '白棋 ⚪' : '黑棋 ⚫';
+    this.setStatus('認輸！' + winner + '獲勝 🏆', 'ok');
+    this.refresh();
+  };
+
+  VsController.prototype.endByScore = function (prefix) {
+    this.gameOver = true;
+    var s = this.engine.scoreEstimate();
+    // 兒童版：黑不貼目，直接比大小
+    var winner, diff;
+    if (s.black > s.white) { winner = '黑棋 ⚫'; diff = s.black - s.white; }
+    else if (s.white > s.black) { winner = '白棋 ⚪'; diff = s.white - s.black; }
+    else { winner = null; }
+    var txt = prefix + '｜黑 ' + s.black + ' vs 白 ' + s.white + '。';
+    if (winner) txt += winner + '贏 ' + diff + ' 子 🏆';
+    else txt += '平手！';
+    this.ui.scoreEl.textContent = '（粗估：黑地 ' + s.blackTerritory + '、白地 ' + s.whiteTerritory + '）';
+    this.setStatus(txt, 'ok');
+    this.refresh();
+  };
+
+  function reasonText(r) {
+    return { occupied: '已有棋子', ko: '打劫不能馬上提回', suicide: '會沒有氣', out: '出界' }[r] || '不行';
+  }
+
+  global.VsController = VsController;
+})(window);
+
+</script>
+  <script>
+/* 基礎棋形練習 —— 針對低段位兒童的入門棋形
+   題型皆為「找出正確的一手」，點對了就過關。
+   概念涵蓋：氣、打吃、提子、逃跑、連接、做眼做活、征子。
+   座標以 13 路棋盤、左上為 (0,0)。 */
+
+(function (global) {
+  'use strict';
+
+  var B = 1, W = 2;
+
+  // 每題：
+  //   id, title, concept, desc, hint
+  //   stones: 初始佈局
+  //   turn:   輪到誰(通常黑=玩家)
+  //   solutions: [{x,y}] 允許的正解落點（點對即過）
+  //   badHint: 點錯時的鼓勵提示（可省略）
+  var PROBLEMS = [
+    {
+      id: 'liberty-1',
+      title: '第 1 關 · 認識「氣」',
+      concept: '氣',
+      desc: '棋子旁邊空的地方叫做「氣」。中間這顆白棋只剩一口氣了（紅圈處）。' +
+            '輪到你(黑棋)，下在紅圈把最後一口氣堵住，就能把白棋吃掉！',
+      stones: [
+        { x: 6, y: 6, color: W },
+        { x: 6, y: 5, color: B },
+        { x: 5, y: 6, color: B },
+        { x: 7, y: 6, color: B }
+      ],
+      turn: B,
+      solutions: [{ x: 6, y: 7 }],
+      marks: [{ x: 6, y: 7, type: 'circle' }],
+      hint: '白棋下面那個空點就是它最後一口氣。'
+    },
+    {
+      id: 'atari-1',
+      title: '第 2 關 · 打吃（叫吃）',
+      concept: '打吃',
+      desc: '讓對方只剩一口氣，叫做「打吃」。輪到你(黑棋)，' +
+            '下哪一點可以打吃白棋，逼它只剩最後一口氣？',
+      stones: [
+        { x: 6, y: 6, color: W },
+        { x: 5, y: 6, color: B },
+        { x: 6, y: 5, color: B }
+      ],
+      turn: B,
+      solutions: [{ x: 7, y: 6 }, { x: 6, y: 7 }],
+      hint: '把白棋四口氣堵到只剩一口，右邊或下面都可以。'
+    },
+    {
+      id: 'capture-2',
+      title: '第 3 關 · 兩顆一起吃',
+      concept: '提子',
+      desc: '白棋這兩顆連在一起，也只剩一口氣了。輪到你(黑棋)，' +
+            '找出那一口氣把它們一次吃光！',
+      stones: [
+        { x: 6, y: 6, color: W },
+        { x: 7, y: 6, color: W },
+        { x: 5, y: 6, color: B },
+        { x: 6, y: 5, color: B },
+        { x: 7, y: 5, color: B },
+        { x: 8, y: 6, color: B },
+        { x: 6, y: 7, color: B }
+      ],
+      turn: B,
+      solutions: [{ x: 7, y: 7 }],
+      marks: [{ x: 7, y: 7, type: 'circle' }],
+      hint: '兩顆白棋共用的氣，只剩右下那一個空點。'
+    },
+    {
+      id: 'escape-1',
+      title: '第 4 關 · 逃跑！',
+      concept: '長氣',
+      desc: '你的黑棋被白棋打吃了，只剩一口氣。輪到你(黑棋)，' +
+            '往哪裡跑可以增加氣、逃出去？',
+      stones: [
+        { x: 6, y: 6, color: B },
+        { x: 5, y: 6, color: W },
+        { x: 6, y: 5, color: W },
+        { x: 7, y: 6, color: W }
+      ],
+      turn: B,
+      solutions: [{ x: 6, y: 7 }],
+      marks: [{ x: 6, y: 7, type: 'circle' }],
+      hint: '往還開著的那口氣（下方）延伸，就能一起變多氣。'
+    },
+    {
+      id: 'connect-1',
+      title: '第 5 關 · 連接',
+      concept: '連接',
+      desc: '把分開的棋子連起來會更堅固。你的兩顆黑棋中間有個缺口，' +
+            '被白棋盯上了。下哪一點把它們連成一塊？',
+      stones: [
+        { x: 5, y: 6, color: B },
+        { x: 7, y: 6, color: B },
+        { x: 6, y: 5, color: W },
+        { x: 6, y: 7, color: W }
+      ],
+      turn: B,
+      solutions: [{ x: 6, y: 6 }],
+      marks: [{ x: 6, y: 6, type: 'circle' }],
+      hint: '正中間那個點能把左右兩顆黑棋牽起來。'
+    },
+    {
+      id: 'eye-1',
+      title: '第 6 關 · 做出兩隻眼',
+      concept: '做活',
+      desc: '有「兩隻眼」的棋永遠吃不掉，這叫「活棋」。你的黑棋左邊已經有一隻眼了（標「眼」的空點），' +
+            '右邊還差一個角沒補好。輪到你(黑棋)，補上那個缺口，做出第二隻眼，讓這塊棋活起來！',
+      stones: [
+        { x: 4, y: 5, color: B }, { x: 5, y: 5, color: B }, { x: 6, y: 5, color: B }, { x: 7, y: 5, color: B }, { x: 8, y: 5, color: B }, { x: 9, y: 5, color: B },
+        { x: 4, y: 6, color: B }, { x: 6, y: 6, color: B }, { x: 7, y: 6, color: B }, { x: 9, y: 6, color: B },
+        { x: 4, y: 7, color: B }, { x: 5, y: 7, color: B }, { x: 6, y: 7, color: B }, { x: 7, y: 7, color: B }, { x: 9, y: 7, color: B }
+      ],
+      turn: B,
+      // 左眼(5,6)已成立；右邊(8,6)只差下方(8,7)一顆黑棋就能成第二隻眼
+      solutions: [{ x: 8, y: 7 }],
+      marks: [{ x: 5, y: 6, type: 'text', text: '眼' }, { x: 8, y: 6, type: 'circle' }],
+      hint: '紅圈那個空點快變成眼了，只差它「下面」缺一顆黑棋；補起來就是第二隻眼。'
+    },
+    {
+      id: 'edge-capture-1',
+      title: '第 7 關 · 邊上吃子',
+      concept: '提子',
+      desc: '棋盤邊邊的棋子氣比較少，更容易被吃！這顆貼邊的白棋只剩一口氣了，' +
+            '輪到你(黑棋)，把它吃掉吧！',
+      stones: [
+        { x: 0, y: 6, color: W },
+        { x: 0, y: 5, color: B },
+        { x: 1, y: 6, color: B }
+      ],
+      turn: B,
+      solutions: [{ x: 0, y: 7 }],
+      marks: [{ x: 0, y: 7, type: 'circle' }],
+      hint: '白棋下面貼著邊的那個空點就是最後一口氣。'
+    },
+    {
+      id: 'corner-capture-2',
+      title: '第 8 關 · 角落抓兩顆',
+      concept: '提子',
+      desc: '角落是氣最少的地方！這兩顆白棋躲在角落，卻只剩一口氣。' +
+            '輪到你(黑棋)，一次把牠們兩顆都抓起來！',
+      stones: [
+        { x: 0, y: 0, color: W },
+        { x: 1, y: 0, color: W },
+        { x: 0, y: 1, color: B },
+        { x: 1, y: 1, color: B }
+      ],
+      turn: B,
+      solutions: [{ x: 2, y: 0 }],
+      marks: [{ x: 2, y: 0, type: 'circle' }],
+      hint: '沿著上面邊線，兩顆白棋右邊那個空點就是唯一的氣。'
+    },
+    {
+      id: 'capture-three-1',
+      title: '第 9 關 · 一次吃三顆！',
+      concept: '提子',
+      desc: '哇，三顆白棋排成一排貼在邊上，全被你包住了，只剩一口氣。' +
+            '輪到你(黑棋)，下最後一手，一次吃掉三顆！',
+      stones: [
+        { x: 0, y: 5, color: W },
+        { x: 0, y: 6, color: W },
+        { x: 0, y: 7, color: W },
+        { x: 0, y: 4, color: B },
+        { x: 1, y: 5, color: B },
+        { x: 1, y: 6, color: B },
+        { x: 1, y: 7, color: B }
+      ],
+      turn: B,
+      solutions: [{ x: 0, y: 8 }],
+      marks: [{ x: 0, y: 8, type: 'circle' }],
+      hint: '三顆白棋共用的最後一口氣，在最下面那顆的下方。'
+    },
+    {
+      id: 'double-atari-1',
+      title: '第 10 關 · 雙打吃（一石二鳥）',
+      concept: '雙打吃',
+      desc: '厲害的一手可以同時攻擊兩塊棋！這裡有上下兩顆白棋，' +
+            '輪到你(黑棋)，找出那個「一下子打吃到兩邊」的神奇點。',
+      stones: [
+        { x: 6, y: 6, color: W },
+        { x: 6, y: 8, color: W },
+        { x: 5, y: 6, color: B },
+        { x: 6, y: 5, color: B },
+        { x: 5, y: 8, color: B },
+        { x: 6, y: 9, color: B }
+      ],
+      turn: B,
+      solutions: [{ x: 6, y: 7 }],
+      hint: '兩顆白棋中間那個點，下下去會讓上下都只剩一口氣，下一手就能吃一顆。'
+    },
+    {
+      id: 'escape-two-1',
+      title: '第 11 關 · 帶著兩顆一起逃',
+      concept: '長氣',
+      desc: '你的兩顆黑棋被白棋團團圍住，只剩一口氣了！' +
+            '輪到你(黑棋)，往還開著的那個方向延伸，帶牠們一起逃出去！',
+      stones: [
+        { x: 6, y: 6, color: B },
+        { x: 7, y: 6, color: B },
+        { x: 5, y: 6, color: W },
+        { x: 6, y: 5, color: W },
+        { x: 6, y: 7, color: W },
+        { x: 7, y: 5, color: W },
+        { x: 7, y: 7, color: W }
+      ],
+      turn: B,
+      solutions: [{ x: 8, y: 6 }],
+      marks: [{ x: 8, y: 6, type: 'circle' }],
+      hint: '只有右邊那口氣還開著，往那裡長出去就能一起變多氣。'
+    },
+    {
+      id: 'life-vital-1',
+      title: '第 12 關 · 做活的正中要點',
+      concept: '做活',
+      desc: '中間有一排長長的空地，如果讓白棋先佔到正中間，你的眼就做不成了。' +
+            '輪到你(黑棋)，搶下最重要的「正中央」，把大空間切成兩隻眼，讓這塊棋活起來！',
+      stones: [
+        { x: 4, y: 6, color: B }, { x: 8, y: 6, color: B },
+        { x: 5, y: 5, color: B }, { x: 6, y: 5, color: B }, { x: 7, y: 5, color: B },
+        { x: 5, y: 7, color: B }, { x: 6, y: 7, color: B }, { x: 7, y: 7, color: B }
+      ],
+      turn: B,
+      solutions: [{ x: 6, y: 6 }],
+      marks: [{ x: 6, y: 6, type: 'circle' }],
+      hint: '下在三個空點的正中央，左右就各自變成一隻眼。'
+    },
+    {
+      id: 'ladder-1',
+      title: '第 13 關 · 征子（門吃）',
+      concept: '征子',
+      desc: '白棋只剩兩口氣。用「征子」一路打吃追著跑，白棋會越跑氣越少。' +
+            '輪到你(黑棋)，下哪一點開始征子（打吃且把它逼向邊角）？',
+      stones: [
+        { x: 6, y: 6, color: W },
+        { x: 6, y: 5, color: B },
+        { x: 5, y: 6, color: B }
+      ],
+      turn: B,
+      solutions: [{ x: 7, y: 6 }, { x: 6, y: 7 }],
+      hint: '先把白棋打成一口氣，之後不管它往哪逃你都繼續打吃。'
+    }
+  ];
+
+  var STORE_KEY = 'chengcheng-go-stars';
+
+  function PracticeController(ui) {
+    this.ui = ui;               // { canvas, titleEl, descEl, hintEl, statusEl, prevBtn, nextBtn, retryBtn, progressEl, starsEl }
+    this.engine = new global.GoEngine(13);
+    this.renderer = new global.BoardRenderer(ui.canvas, this.engine);
+    this.index = 0;
+    this.solved = false;
+    this.store = this.loadStore();   // { 題目id: true } 已過關紀錄
+    var self = this;
+    this.renderer.onPoint(function (x, y) { self.handleClick(x, y); });
+    this.bind();
+    this.renderStars();
+    this.load(this.firstUnsolved());
+  }
+
+  // ---- 進度存檔（localStorage，換頁/關掉重開都記得） ----
+  PracticeController.prototype.loadStore = function () {
+    try { return JSON.parse(global.localStorage.getItem(STORE_KEY)) || {}; }
+    catch (e) { return {}; }
+  };
+  PracticeController.prototype.saveStore = function () {
+    try { global.localStorage.setItem(STORE_KEY, JSON.stringify(this.store)); }
+    catch (e) { /* 無痕模式等情況忽略 */ }
+  };
+  PracticeController.prototype.starCount = function () {
+    var n = 0;
+    for (var i = 0; i < PROBLEMS.length; i++) if (this.store[PROBLEMS[i].id]) n++;
+    return n;
+  };
+  PracticeController.prototype.firstUnsolved = function () {
+    for (var i = 0; i < PROBLEMS.length; i++) if (!this.store[PROBLEMS[i].id]) return i;
+    return 0;
+  };
+
+  // ---- 星星列：每關一顆，過關亮金星，可點擊跳關 ----
+  PracticeController.prototype.renderStars = function () {
+    var el = this.ui.starsEl;
+    if (!el) return;
+    el.innerHTML = '';
+    var self = this;
+    for (var i = 0; i < PROBLEMS.length; i++) {
+      var s = document.createElement('button');
+      var done = !!this.store[PROBLEMS[i].id];
+      s.className = 'star' + (done ? ' done' : '') + (i === this.index ? ' current' : '');
+      s.textContent = done ? '⭐' : (i + 1);
+      s.title = PROBLEMS[i].title;
+      (function (idx) { s.addEventListener('click', function () { self.load(idx); }); })(i);
+      el.appendChild(s);
+    }
+  };
+
+  PracticeController.prototype.bind = function () {
+    var self = this, ui = this.ui;
+    ui.prevBtn.addEventListener('click', function () { self.load(self.index - 1); });
+    ui.nextBtn.addEventListener('click', function () { self.load(self.index + 1); });
+    ui.retryBtn.addEventListener('click', function () { self.load(self.index); });
+    if (ui.resetBtn) {
+      ui.resetBtn.addEventListener('click', function () {
+        if (!global.confirm('確定要清除所有星星，重新挑戰嗎？')) return;
+        self.store = {};
+        self.saveStore();
+        self.load(0);
+      });
+    }
+  };
+
+  PracticeController.prototype.load = function (i) {
+    if (i < 0) i = 0;
+    if (i >= PROBLEMS.length) i = PROBLEMS.length - 1;
+    this.index = i;
+    this.solved = false;
+    var p = PROBLEMS[i];
+    this.engine.setup(p.stones, p.turn);
+    this.renderer.setMarks(p.marks || []);
+    this.renderer.draw();
+
+    this.ui.titleEl.textContent = p.title;
+    this.ui.descEl.textContent = p.desc;
+    this.ui.hintEl.textContent = '';
+    this.ui.hintEl.classList.remove('show');
+    if (this.store[p.id]) {
+      this.setStatus('⭐ 這一關已經通過囉！想再玩一次就直接下正解 👆', 'ok');
+    } else {
+      this.setStatus('輪到你（黑棋），點棋盤下一手 👆', '');
+    }
+    this.ui.progressEl.textContent = '第 ' + (i + 1) + ' / ' + PROBLEMS.length + ' 關　⭐ 已得 ' + this.starCount() + ' 顆星';
+    this.ui.prevBtn.disabled = (i === 0);
+    this.ui.nextBtn.disabled = (i === PROBLEMS.length - 1);
+    this.renderStars();
+  };
+
+  PracticeController.prototype.setStatus = function (text, cls) {
+    var el = this.ui.statusEl;
+    el.textContent = text;
+    el.className = 'status ' + (cls || '');
+  };
+
+  PracticeController.prototype.handleClick = function (x, y) {
+    if (this.solved) return;
+    var p = PROBLEMS[this.index];
+    var isSolution = p.solutions.some(function (s) { return s.x === x && s.y === y; });
+
+    var res = this.engine.play(x, y);
+    if (!res.legal) {
+      this.setStatus('這裡不能下喔（' + reasonText(res.reason) + '），換一個點試試 🙂', 'warn');
+      return;
+    }
+    this.renderer.setMarks([]);
+    this.renderer.draw();
+
+    if (isSolution) {
+      this.solved = true;
+      var newStar = !this.store[p.id];
+      this.store[p.id] = true;
+      this.saveStore();
+      this.renderStars();
+      var got = this.starCount();
+      var msg = '🎉 答對了！' + (res.captured.length ? '成功吃掉 ' + res.captured.length + ' 顆白棋！' : '漂亮的一手！');
+      if (newStar) msg += ' ⭐ 得到一顆星（' + got + '/' + PROBLEMS.length + '）';
+      var allClear = (got === PROBLEMS.length);
+      if (allClear) msg = '🏆 全部 ' + PROBLEMS.length + ' 關都通關了！澂澂好棒！🎉';
+      this.setStatus(msg, 'ok');
+      this.ui.progressEl.textContent = '第 ' + (this.index + 1) + ' / ' + PROBLEMS.length + ' 關　⭐ 已得 ' + got + ' 顆星';
+      celebrate(this.ui.canvas);
+      // 誇張過關特效
+      var wrap = this.ui.canvas.parentNode;
+      if (global.FX) {
+        if (allClear) {
+          global.FX.celebrate({ big: true, shakeEl: wrap });
+        } else {
+          global.FX.celebrate({ text: '🎉 第 ' + (this.index + 1) + ' 關 過關囉！ ⭐', shakeEl: wrap });
+        }
+      }
+    } else {
+      this.setStatus('差一點點～再想想看 💪', 'warn');
+      this.ui.hintEl.textContent = '💡 提示：' + p.hint;
+      this.ui.hintEl.classList.add('show');
+      // 讓小孩看到後果後可再試：短暫延遲後還原此手
+      var self = this;
+      setTimeout(function () {
+        self.engine.undo();
+        self.renderer.setMarks(p.marks || []);
+        self.renderer.draw();
+      }, 900);
+    }
+  };
+
+  function reasonText(r) {
+    return { occupied: '已經有棋子', ko: '打劫暫時不能下', suicide: '會沒有氣', out: '超出棋盤' }[r] || '不行';
+  }
+
+  function celebrate(canvas) {
+    canvas.classList.remove('celebrate');
+    void canvas.offsetWidth;
+    canvas.classList.add('celebrate');
+  }
+
+  global.PracticeController = PracticeController;
+  global.GO_PROBLEMS = PROBLEMS;
+})(window);
+
+</script>
+  <script>
+    // 分頁切換
+    var tabs = document.querySelectorAll('.tab');
+    tabs.forEach(function (t) {
+      t.addEventListener('click', function () {
+        tabs.forEach(function (x) { x.classList.remove('active'); });
+        t.classList.add('active');
+        document.querySelectorAll('.page').forEach(function (p) { p.classList.remove('active'); });
+        document.getElementById('page-' + t.dataset.page).classList.add('active');
+      });
+    });
+
+    // 啟動對戰
+    var vs = new VsController({
+      canvas: document.getElementById('vs-canvas'),
+      turnEl: document.getElementById('vs-turn'),
+      capBlackEl: document.getElementById('vs-cap-black'),
+      capWhiteEl: document.getElementById('vs-cap-white'),
+      statusEl: document.getElementById('vs-status'),
+      scoreEl: document.getElementById('vs-score'),
+      modeSel: document.getElementById('vs-mode'),
+      undoBtn: document.getElementById('vs-undo'),
+      passBtn: document.getElementById('vs-pass'),
+      resignBtn: document.getElementById('vs-resign'),
+      restartBtn: document.getElementById('vs-restart')
+    });
+
+    // 啟動練習
+    var practice = new PracticeController({
+      canvas: document.getElementById('pr-canvas'),
+      titleEl: document.getElementById('pr-title'),
+      descEl: document.getElementById('pr-desc'),
+      hintEl: document.getElementById('pr-hint'),
+      statusEl: document.getElementById('pr-status'),
+      progressEl: document.getElementById('pr-progress'),
+      starsEl: document.getElementById('pr-stars'),
+      prevBtn: document.getElementById('pr-prev'),
+      nextBtn: document.getElementById('pr-next'),
+      retryBtn: document.getElementById('pr-retry'),
+      resetBtn: document.getElementById('pr-reset')
+    });
+  </script>
+</body>
+</html>
