@@ -283,6 +283,15 @@ select {
 .fx-shake-big { animation: fxshakebig .7s ease; }
 
 footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
+.switch-link {
+  display: inline-block;
+  margin-top: 6px;
+  color: var(--red);
+  font-weight: 700;
+  text-decoration: none;
+  opacity: 1;
+}
+.switch-link:hover { text-decoration: underline; }
 
 @media (max-width: 720px) {
   .panel { width: 100%; max-width: 420px; }

@@ -294,6 +294,15 @@ select {
 .fx-shake-big { animation: fxshakebig .7s ease; }
 
 footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
+.switch-link {
+  display: inline-block;
+  margin-top: 6px;
+  color: var(--red);
+  font-weight: 700;
+  text-decoration: none;
+  opacity: 1;
+}
+.switch-link:hover { text-decoration: underline; }
 
 @media (max-width: 720px) {
   .panel { width: 100%; max-width: 420px; }
@@ -376,7 +385,8 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
     </div>
   </section>
 
-  <footer>用滑鼠或手指點棋盤上的交叉點就能落子 · 黑棋先下</footer>
+  <footer>用滑鼠或手指點棋盤上的交叉點就能落子 · 黑棋先下
+  </footer>
 
   <script>
 /* 圍棋規則核心引擎 —— 13 路棋盤

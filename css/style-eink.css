@@ -185,6 +185,13 @@ select {
 .star.current { border-width: 4px; }                  /* 目前關：粗框 */
 
 footer { text-align: center; font-size: 13px; padding: 10px; }
+.switch-link {
+  display: inline-block;
+  margin-top: 6px;
+  color: #000;
+  font-weight: 800;
+  text-decoration: underline;
+}
 
 /* 明確關閉任何可能殘留的動畫（墨水裝置不適合） */
 canvas.celebrate { animation: none !important; }

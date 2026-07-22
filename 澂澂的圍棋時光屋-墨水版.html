@@ -196,6 +196,13 @@ select {
 .star.current { border-width: 4px; }                  /* 目前關：粗框 */
 
 footer { text-align: center; font-size: 13px; padding: 10px; }
+.switch-link {
+  display: inline-block;
+  margin-top: 6px;
+  color: #000;
+  font-weight: 800;
+  text-decoration: underline;
+}
 
 /* 明確關閉任何可能殘留的動畫（墨水裝置不適合） */
 canvas.celebrate { animation: none !important; }
@@ -277,7 +284,8 @@ canvas.celebrate { animation: none !important; }
     </div>
   </section>
 
-  <footer>點棋盤上的交叉點就能落子 · 黑棋先下 · 此版本為墨水裝置最佳化（無特效音效）</footer>
+  <footer>點棋盤上的交叉點就能落子 · 黑棋先下 · 此版本為墨水裝置最佳化（無特效音效）
+  </footer>
 
   <script>
 /* 圍棋規則核心引擎 —— 13 路棋盤

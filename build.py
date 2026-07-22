@@ -29,6 +29,9 @@ def build(html_path, css_path, js_order, out, lock_zoom):
         assert tag in html, '找不到 script 標籤: ' + tag
         html = html.replace(tag, '<script>\n' + code + '\n</script>')
 
+    # 單檔為獨立離線檔，移除指向另一版檔案的切換連結（否則會是死連結）
+    html = re.sub(r'\s*<br><a class="switch-link"[^>]*>.*?</a>\s*', '\n  ', html)
+
     b180 = base64.b64encode(open('icon-180.png', 'rb').read()).decode()
     html = html.replace('href="icon-180.png"',
                         'href="data:image/png;base64,' + b180 + '"')
