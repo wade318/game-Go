@@ -11,9 +11,14 @@
 
   var EMPTY = 0;
 
-  function GoAI(engine) {
+  function GoAI(engine, strength) {
     this.engine = engine;
+    this.strength = (strength == null) ? 2 : strength;  // 0(最弱)~5(最強)
   }
+
+  GoAI.prototype.setStrength = function (s) {
+    this.strength = s;
+  };
 
   // 計算「若在 (x,y) 落子後，自己這塊的氣」
   function selfLibertiesAfter(engine, x, y, color) {
@@ -50,42 +55,75 @@
     if (!moves.length) return null;
 
     var opp = e.opponent(color);
+    var s = this.strength;                 // 0~5
+    // 強度越高：越信任棋理、越少亂下、吃子/打吃看得越重
+    var smartW = 0.3 + 0.14 * s;           // 棋理權重
+    var noiseAmp = (5 - s) * 1.6 + 0.5;    // 隨機幅度（越弱越亂）
+    var capW = 4 + s * 2;                  // 吃子權重（弱手常錯過吃子）
+    var atariW = 1 + s * 1.2;              // 打吃權重
+    var dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+
+    // 高段(>=3)：先找出己方被打吃(剩1氣)的群，之後會嘗試救活
+    var ataried = [];
+    if (s >= 3) {
+      var seen = {};
+      for (var yy = 0; yy < e.size; yy++) {
+        for (var xx = 0; xx < e.size; xx++) {
+          if (e.board[yy][xx] === color && !seen[xx + ',' + yy]) {
+            var gg = e.groupAndLiberties(xx, yy);
+            for (var q = 0; q < gg.stones.length; q++) seen[gg.stones[q].x + ',' + gg.stones[q].y] = true;
+            if (gg.liberties === 1) ataried.push(gg);
+          }
+        }
+      }
+    }
+
     var best = [];
     var bestScore = -Infinity;
     var center = (e.size - 1) / 2;
 
     for (var i = 0; i < moves.length; i++) {
       var mv = moves[i];
-      var score = 0;
+      var smart = 0;
 
-      // 1. 吃子加高分
-      score += mv.captured * 12;
+      // 吃子
+      smart += mv.captured * capW;
 
-      // 3. 自身氣：落子後自己氣越多越好，避免自填
+      // 自身氣：避免自送打吃（入門 s<1 不懂，故較弱）
       var libs = selfLibertiesAfter(e, mv.x, mv.y, color);
-      if (libs <= 1 && mv.captured === 0) score -= 8;   // 自送打吃，扣分
-      score += Math.min(libs, 4) * 1.2;
+      if (libs <= 1 && mv.captured === 0 && s >= 1) smart -= 8 + s;
+      smart += Math.min(libs, 4) * 1.2;
 
-      // 2. 打吃對方：落子後讓某鄰接敵塊剩 1 氣，加分
-      var dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+      // 打吃對方 / 貼近互動
       e.board[mv.y][mv.x] = color;
       for (var d = 0; d < 4; d++) {
         var nx = mv.x + dirs[d][0], ny = mv.y + dirs[d][1];
         if (!e.inBounds(nx, ny)) continue;
         if (e.board[ny][nx] === opp) {
           var og = e.groupAndLiberties(nx, ny);
-          if (og.liberties === 1) score += 5;
+          if (og.liberties === 1) smart += atariW * 4;
         }
-        // 貼近己方或敵方棋子（有互動）
-        if (e.board[ny][nx] !== EMPTY) score += 0.8;
+        if (e.board[ny][nx] !== EMPTY) smart += 0.8;
       }
       e.board[mv.y][mv.x] = EMPTY;
 
-      // 5. 偏好中央 + 加隨機抖動，避免每盤一樣
-      var distC = Math.abs(mv.x - center) + Math.abs(mv.y - center);
-      score += (e.size - distC) * 0.15;
-      score += Math.random() * 1.5;
+      // 高段：救自己被打吃的群
+      if (s >= 3 && ataried.length) {
+        for (var a = 0; a < ataried.length; a++) {
+          var adj = false;
+          for (var p = 0; p < ataried[a].stones.length; p++) {
+            var st = ataried[a].stones[p];
+            if (Math.abs(st.x - mv.x) + Math.abs(st.y - mv.y) === 1) { adj = true; break; }
+          }
+          if (adj && selfLibertiesAfter(e, mv.x, mv.y, color) >= 2) smart += 6 + s;
+        }
+      }
 
+      // 偏好中央
+      var distC = Math.abs(mv.x - center) + Math.abs(mv.y - center);
+      smart += (e.size - distC) * 0.15;
+
+      var score = smart * smartW + Math.random() * noiseAmp;
       if (score > bestScore) { bestScore = score; best = [mv]; }
       else if (score === bestScore) best.push(mv);
     }

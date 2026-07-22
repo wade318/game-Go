@@ -160,6 +160,7 @@ button.btn.gray { background: #8a8577; }
 select {
   width: 100%;
   padding: 10px;
+  margin-bottom: 8px;
   border-radius: 12px;
   border: 2px solid #e6ddc9;
   font-size: 15px;
@@ -332,6 +333,21 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
         <select id="vs-mode">
           <option value="ai">🤖 我 vs 電腦（適合練習）</option>
           <option value="human">👫 兩個人一起下</option>
+        </select>
+        <select id="vs-level" title="對手等級">
+          <option value="0">🐣 入門（約 20 級）</option>
+          <option value="1" selected>🌱 初學（約 15 級）</option>
+          <option value="2">🙂 初級（約 10 級）</option>
+          <option value="3">💪 中級（約 5 級）</option>
+          <option value="4">🔥 高級（約 1 級）</option>
+          <option value="5">🏆 高手（約 1 段）</option>
+        </select>
+        <select id="vs-handicap" title="讓子">
+          <option value="0" selected>不讓子（公平對局）</option>
+          <option value="2">讓 2 子（我比較容易）</option>
+          <option value="4">讓 4 子</option>
+          <option value="6">讓 6 子</option>
+          <option value="9">讓 9 子（最簡單）</option>
         </select>
 
         <div class="turn-badge">輪到：<span id="vs-turn">⚫ 黑棋</span></div>
@@ -917,9 +933,14 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
 
   var EMPTY = 0;
 
-  function GoAI(engine) {
+  function GoAI(engine, strength) {
     this.engine = engine;
+    this.strength = (strength == null) ? 2 : strength;  // 0(最弱)~5(最強)
   }
+
+  GoAI.prototype.setStrength = function (s) {
+    this.strength = s;
+  };
 
   // 計算「若在 (x,y) 落子後，自己這塊的氣」
   function selfLibertiesAfter(engine, x, y, color) {
@@ -956,42 +977,75 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
     if (!moves.length) return null;
 
     var opp = e.opponent(color);
+    var s = this.strength;                 // 0~5
+    // 強度越高：越信任棋理、越少亂下、吃子/打吃看得越重
+    var smartW = 0.3 + 0.14 * s;           // 棋理權重
+    var noiseAmp = (5 - s) * 1.6 + 0.5;    // 隨機幅度（越弱越亂）
+    var capW = 4 + s * 2;                  // 吃子權重（弱手常錯過吃子）
+    var atariW = 1 + s * 1.2;              // 打吃權重
+    var dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+
+    // 高段(>=3)：先找出己方被打吃(剩1氣)的群，之後會嘗試救活
+    var ataried = [];
+    if (s >= 3) {
+      var seen = {};
+      for (var yy = 0; yy < e.size; yy++) {
+        for (var xx = 0; xx < e.size; xx++) {
+          if (e.board[yy][xx] === color && !seen[xx + ',' + yy]) {
+            var gg = e.groupAndLiberties(xx, yy);
+            for (var q = 0; q < gg.stones.length; q++) seen[gg.stones[q].x + ',' + gg.stones[q].y] = true;
+            if (gg.liberties === 1) ataried.push(gg);
+          }
+        }
+      }
+    }
+
     var best = [];
     var bestScore = -Infinity;
     var center = (e.size - 1) / 2;
 
     for (var i = 0; i < moves.length; i++) {
       var mv = moves[i];
-      var score = 0;
+      var smart = 0;
 
-      // 1. 吃子加高分
-      score += mv.captured * 12;
+      // 吃子
+      smart += mv.captured * capW;
 
-      // 3. 自身氣：落子後自己氣越多越好，避免自填
+      // 自身氣：避免自送打吃（入門 s<1 不懂，故較弱）
       var libs = selfLibertiesAfter(e, mv.x, mv.y, color);
-      if (libs <= 1 && mv.captured === 0) score -= 8;   // 自送打吃，扣分
-      score += Math.min(libs, 4) * 1.2;
+      if (libs <= 1 && mv.captured === 0 && s >= 1) smart -= 8 + s;
+      smart += Math.min(libs, 4) * 1.2;
 
-      // 2. 打吃對方：落子後讓某鄰接敵塊剩 1 氣，加分
-      var dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+      // 打吃對方 / 貼近互動
       e.board[mv.y][mv.x] = color;
       for (var d = 0; d < 4; d++) {
         var nx = mv.x + dirs[d][0], ny = mv.y + dirs[d][1];
         if (!e.inBounds(nx, ny)) continue;
         if (e.board[ny][nx] === opp) {
           var og = e.groupAndLiberties(nx, ny);
-          if (og.liberties === 1) score += 5;
+          if (og.liberties === 1) smart += atariW * 4;
         }
-        // 貼近己方或敵方棋子（有互動）
-        if (e.board[ny][nx] !== EMPTY) score += 0.8;
+        if (e.board[ny][nx] !== EMPTY) smart += 0.8;
       }
       e.board[mv.y][mv.x] = EMPTY;
 
-      // 5. 偏好中央 + 加隨機抖動，避免每盤一樣
-      var distC = Math.abs(mv.x - center) + Math.abs(mv.y - center);
-      score += (e.size - distC) * 0.15;
-      score += Math.random() * 1.5;
+      // 高段：救自己被打吃的群
+      if (s >= 3 && ataried.length) {
+        for (var a = 0; a < ataried.length; a++) {
+          var adj = false;
+          for (var p = 0; p < ataried[a].stones.length; p++) {
+            var st = ataried[a].stones[p];
+            if (Math.abs(st.x - mv.x) + Math.abs(st.y - mv.y) === 1) { adj = true; break; }
+          }
+          if (adj && selfLibertiesAfter(e, mv.x, mv.y, color) >= 2) smart += 6 + s;
+        }
+      }
 
+      // 偏好中央
+      var distC = Math.abs(mv.x - center) + Math.abs(mv.y - center);
+      smart += (e.size - distC) * 0.15;
+
+      var score = smart * smartW + Math.random() * noiseAmp;
       if (score > bestScore) { bestScore = score; best = [mv]; }
       else if (score === bestScore) best.push(mv);
     }
@@ -1242,12 +1296,31 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
 
   var B = 1, W = 2;
 
+  // 對手等級：strength 0~5，附換算級/段標籤
+  var LEVELS = [
+    { strength: 0, label: '入門（約 20 級）' },
+    { strength: 1, label: '初學（約 15 級）' },
+    { strength: 2, label: '初級（約 10 級）' },
+    { strength: 3, label: '中級（約 5 級）' },
+    { strength: 4, label: '高級（約 1 級）' },
+    { strength: 5, label: '高手（約 1 段）' }
+  ];
+
+  // 13 路讓子星位（依讓子數擺放）
+  var HANDICAP_POINTS = {
+    2: [[9, 3], [3, 9]],
+    4: [[3, 3], [9, 3], [3, 9], [9, 9]],
+    6: [[3, 3], [9, 3], [3, 9], [9, 9], [3, 6], [9, 6]],
+    9: [[3, 3], [9, 3], [3, 9], [9, 9], [3, 6], [9, 6], [6, 3], [6, 9], [6, 6]]
+  };
+
   function VsController(ui) {
-    this.ui = ui;   // { canvas, turnEl, capBlackEl, capWhiteEl, statusEl,
-                    //   modeSel, undoBtn, passBtn, resignBtn, restartBtn, scoreEl }
+    this.ui = ui;
     this.engine = new global.GoEngine(13);
     this.renderer = new global.BoardRenderer(ui.canvas, this.engine, { eink: !!ui.eink });
-    this.ai = new global.GoAI(this.engine);
+    this.level = ui.levelSel ? parseInt(ui.levelSel.value, 10) : 1;
+    this.ai = new global.GoAI(this.engine, LEVELS[this.level].strength);
+    this.handicap = ui.handicapSel ? parseInt(ui.handicapSel.value, 10) : 0;
     this.mode = 'ai';        // 'ai' | 'human'
     this.aiColor = W;        // 電腦執白，玩家執黑先
     this.gameOver = false;
@@ -1265,6 +1338,19 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
       self.mode = ui.modeSel.value;
       self.restart();
     });
+    if (ui.levelSel) {
+      ui.levelSel.addEventListener('change', function () {
+        self.level = parseInt(ui.levelSel.value, 10);
+        self.ai.setStrength(LEVELS[self.level].strength);
+        self.restart();
+      });
+    }
+    if (ui.handicapSel) {
+      ui.handicapSel.addEventListener('change', function () {
+        self.handicap = parseInt(ui.handicapSel.value, 10);
+        self.restart();
+      });
+    }
     ui.undoBtn.addEventListener('click', function () { self.undo(); });
     ui.passBtn.addEventListener('click', function () { self.pass(); });
     ui.resignBtn.addEventListener('click', function () { self.resign(); });
@@ -1276,9 +1362,25 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
     this.gameOver = false;
     this.thinking = false;
     this.ui.scoreEl.textContent = '';
+
+    // 讓子（僅對電腦時生效）：黑先擺讓子，之後白(電腦)先下
+    var handInfo = '';
+    if (this.mode === 'ai' && this.handicap > 0 && HANDICAP_POINTS[this.handicap]) {
+      var pts = HANDICAP_POINTS[this.handicap];
+      for (var i = 0; i < pts.length; i++) this.engine.board[pts[i][1]][pts[i][0]] = B;
+      this.engine.turn = W;
+      handInfo = '（讓 ' + this.handicap + ' 子）';
+    }
+
     this.renderer.draw();
     this.refresh();
-    this.setStatus('開始對局！黑棋先下 ⚫', '');
+
+    if (this.mode === 'ai') {
+      this.setStatus('對手：' + LEVELS[this.level].label + handInfo + '　開始對局！', '');
+      if (this.isAiTurn()) { this.aiMove(); return; }
+    } else {
+      this.setStatus('雙人對戰　開始！黑棋先下 ⚫', '');
+    }
   };
 
   VsController.prototype.refresh = function () {
@@ -1837,6 +1939,8 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
       statusEl: document.getElementById('vs-status'),
       scoreEl: document.getElementById('vs-score'),
       modeSel: document.getElementById('vs-mode'),
+      levelSel: document.getElementById('vs-level'),
+      handicapSel: document.getElementById('vs-handicap'),
       undoBtn: document.getElementById('vs-undo'),
       passBtn: document.getElementById('vs-pass'),
       resignBtn: document.getElementById('vs-resign'),

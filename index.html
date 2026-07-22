@@ -31,6 +31,21 @@
           <option value="ai">🤖 我 vs 電腦（適合練習）</option>
           <option value="human">👫 兩個人一起下</option>
         </select>
+        <select id="vs-level" title="對手等級">
+          <option value="0">🐣 入門（約 20 級）</option>
+          <option value="1" selected>🌱 初學（約 15 級）</option>
+          <option value="2">🙂 初級（約 10 級）</option>
+          <option value="3">💪 中級（約 5 級）</option>
+          <option value="4">🔥 高級（約 1 級）</option>
+          <option value="5">🏆 高手（約 1 段）</option>
+        </select>
+        <select id="vs-handicap" title="讓子">
+          <option value="0" selected>不讓子（公平對局）</option>
+          <option value="2">讓 2 子（我比較容易）</option>
+          <option value="4">讓 4 子</option>
+          <option value="6">讓 6 子</option>
+          <option value="9">讓 9 子（最簡單）</option>
+        </select>
 
         <div class="turn-badge">輪到：<span id="vs-turn">⚫ 黑棋</span></div>
 
@@ -114,6 +129,8 @@
       statusEl: document.getElementById('vs-status'),
       scoreEl: document.getElementById('vs-score'),
       modeSel: document.getElementById('vs-mode'),
+      levelSel: document.getElementById('vs-level'),
+      handicapSel: document.getElementById('vs-handicap'),
       undoBtn: document.getElementById('vs-undo'),
       passBtn: document.getElementById('vs-pass'),
       resignBtn: document.getElementById('vs-resign'),

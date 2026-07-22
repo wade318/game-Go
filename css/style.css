@@ -149,6 +149,7 @@ button.btn.gray { background: #8a8577; }
 select {
   width: 100%;
   padding: 10px;
+  margin-bottom: 8px;
   border-radius: 12px;
   border: 2px solid #e6ddc9;
   font-size: 15px;

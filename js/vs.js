@@ -6,12 +6,31 @@
 
   var B = 1, W = 2;
 
+  // 對手等級：strength 0~5，附換算級/段標籤
+  var LEVELS = [
+    { strength: 0, label: '入門（約 20 級）' },
+    { strength: 1, label: '初學（約 15 級）' },
+    { strength: 2, label: '初級（約 10 級）' },
+    { strength: 3, label: '中級（約 5 級）' },
+    { strength: 4, label: '高級（約 1 級）' },
+    { strength: 5, label: '高手（約 1 段）' }
+  ];
+
+  // 13 路讓子星位（依讓子數擺放）
+  var HANDICAP_POINTS = {
+    2: [[9, 3], [3, 9]],
+    4: [[3, 3], [9, 3], [3, 9], [9, 9]],
+    6: [[3, 3], [9, 3], [3, 9], [9, 9], [3, 6], [9, 6]],
+    9: [[3, 3], [9, 3], [3, 9], [9, 9], [3, 6], [9, 6], [6, 3], [6, 9], [6, 6]]
+  };
+
   function VsController(ui) {
-    this.ui = ui;   // { canvas, turnEl, capBlackEl, capWhiteEl, statusEl,
-                    //   modeSel, undoBtn, passBtn, resignBtn, restartBtn, scoreEl }
+    this.ui = ui;
     this.engine = new global.GoEngine(13);
     this.renderer = new global.BoardRenderer(ui.canvas, this.engine, { eink: !!ui.eink });
-    this.ai = new global.GoAI(this.engine);
+    this.level = ui.levelSel ? parseInt(ui.levelSel.value, 10) : 1;
+    this.ai = new global.GoAI(this.engine, LEVELS[this.level].strength);
+    this.handicap = ui.handicapSel ? parseInt(ui.handicapSel.value, 10) : 0;
     this.mode = 'ai';        // 'ai' | 'human'
     this.aiColor = W;        // 電腦執白，玩家執黑先
     this.gameOver = false;
@@ -29,6 +48,19 @@
       self.mode = ui.modeSel.value;
       self.restart();
     });
+    if (ui.levelSel) {
+      ui.levelSel.addEventListener('change', function () {
+        self.level = parseInt(ui.levelSel.value, 10);
+        self.ai.setStrength(LEVELS[self.level].strength);
+        self.restart();
+      });
+    }
+    if (ui.handicapSel) {
+      ui.handicapSel.addEventListener('change', function () {
+        self.handicap = parseInt(ui.handicapSel.value, 10);
+        self.restart();
+      });
+    }
     ui.undoBtn.addEventListener('click', function () { self.undo(); });
     ui.passBtn.addEventListener('click', function () { self.pass(); });
     ui.resignBtn.addEventListener('click', function () { self.resign(); });
@@ -40,9 +72,25 @@
     this.gameOver = false;
     this.thinking = false;
     this.ui.scoreEl.textContent = '';
+
+    // 讓子（僅對電腦時生效）：黑先擺讓子，之後白(電腦)先下
+    var handInfo = '';
+    if (this.mode === 'ai' && this.handicap > 0 && HANDICAP_POINTS[this.handicap]) {
+      var pts = HANDICAP_POINTS[this.handicap];
+      for (var i = 0; i < pts.length; i++) this.engine.board[pts[i][1]][pts[i][0]] = B;
+      this.engine.turn = W;
+      handInfo = '（讓 ' + this.handicap + ' 子）';
+    }
+
     this.renderer.draw();
     this.refresh();
-    this.setStatus('開始對局！黑棋先下 ⚫', '');
+
+    if (this.mode === 'ai') {
+      this.setStatus('對手：' + LEVELS[this.level].label + handInfo + '　開始對局！', '');
+      if (this.isAiTurn()) { this.aiMove(); return; }
+    } else {
+      this.setStatus('雙人對戰　開始！黑棋先下 ⚫', '');
+    }
   };
 
   VsController.prototype.refresh = function () {
