@@ -235,6 +235,7 @@ select {
   display: none;
 }
 .hint.show { display: block; }
+.cat-select { font-weight: 700; margin-bottom: 6px; }
 .progress { text-align: center; font-weight: 700; margin: 6px 0; opacity: .7; }
 
 /* 星星關卡列 */
@@ -441,6 +442,7 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
         <canvas id="pr-canvas" width="560" height="560"></canvas>
       </div>
       <div class="panel">
+        <select id="pr-category" class="cat-select"></select>
         <div class="progress" id="pr-progress">進度 1 / 13</div>
         <div class="stars" id="pr-stars"></div>
         <h3 class="prob-title" id="pr-title">題目</h3>
@@ -1198,6 +1200,222 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
   }
 
   global.Teach = { commentMove: commentMove };
+})(window);
+
+</script>
+  <script>
+/* 練習題自動生成器 —— 用引擎生成並「自我驗證」正解，只回傳驗證通過的題目
+   類別：吃子(capture)、打吃(atari)、逃子(escape)
+   種子固定 → 每次載入題目一致（星星進度可累積） */
+
+(function (global) {
+  'use strict';
+
+  var B = 1, W = 2, EMPTY = 0;
+  var DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+
+  // 種子亂數（mulberry32）
+  function makeRng(seed) {
+    return function () {
+      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+      var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  function newEngine() { return new global.GoEngine(13); }
+
+  // 某群（stones 陣列）的所有「氣」座標
+  function libertyPoints(e, stones) {
+    var seen = {}, libs = [];
+    for (var i = 0; i < stones.length; i++) {
+      for (var d = 0; d < 4; d++) {
+        var nx = stones[i].x + DIRS[d][0], ny = stones[i].y + DIRS[d][1];
+        if (!e.inBounds(nx, ny)) continue;
+        if (e.get(nx, ny) === EMPTY) {
+          var k = nx + ',' + ny;
+          if (!seen[k]) { seen[k] = true; libs.push({ x: nx, y: ny }); }
+        }
+      }
+    }
+    return libs;
+  }
+
+  function allHaveLiberties(e, pts) {
+    for (var i = 0; i < pts.length; i++) {
+      if (e.get(pts[i].x, pts[i].y) !== EMPTY && e.groupAndLiberties(pts[i].x, pts[i].y).liberties === 0) return false;
+    }
+    return true;
+  }
+
+  // 隨機放一個白群（1~2 子，避免貼邊太滿）
+  function placeWhite(e, rand) {
+    var cx = 2 + Math.floor(rand() * 9);
+    var cy = 2 + Math.floor(rand() * 9);
+    var white = [{ x: cx, y: cy }];
+    if (rand() < 0.35) {
+      var d = DIRS[Math.floor(rand() * 4)];
+      var nx = cx + d[0], ny = cy + d[1];
+      if (e.inBounds(nx, ny)) white.push({ x: nx, y: ny });
+    }
+    for (var i = 0; i < white.length; i++) e.board[white[i].y][white[i].x] = W;
+    return white;
+  }
+
+  function toStones(list, color) {
+    return list.map(function (s) { return { x: s.x, y: s.y, color: color }; });
+  }
+
+  // ---- 吃子：白在打吃，黑提子（唯一解）----
+  function genCapture(rand) {
+    for (var t = 0; t < 300; t++) {
+      var e = newEngine();
+      var white = placeWhite(e, rand);
+      var g = e.groupAndLiberties(white[0].x, white[0].y);
+      var libs = libertyPoints(e, g.stones);
+      if (libs.length < 2 || libs.length > 4) continue;
+      var solIdx = Math.floor(rand() * libs.length);
+      var sol = libs[solIdx];
+      var blacks = [];
+      for (var j = 0; j < libs.length; j++) {
+        if (j === solIdx) continue;
+        e.board[libs[j].y][libs[j].x] = B;
+        blacks.push(libs[j]);
+      }
+      var r = e.tryPlay(sol.x, sol.y, B);
+      if (!r.legal || r.captured.length !== g.stones.length) continue;
+      if (!allHaveLiberties(e, blacks)) continue;
+      return { stones: toStones(white, W).concat(toStones(blacks, B)), turn: B, solutions: [sol] };
+    }
+    return null;
+  }
+
+  // ---- 打吃：白剩 2 氣，黑打吃成 1 氣（兩個解都算）----
+  function genAtari(rand) {
+    for (var t = 0; t < 300; t++) {
+      var e = newEngine();
+      var white = placeWhite(e, rand);
+      var g = e.groupAndLiberties(white[0].x, white[0].y);
+      var libs = libertyPoints(e, g.stones);
+      if (libs.length < 2 || libs.length > 4) continue;
+      // 填到只剩 2 口氣
+      var blacks = [];
+      while (libs.length > 2) {
+        var p = libs.pop();
+        e.board[p.y][p.x] = B;
+        blacks.push(p);
+      }
+      // 重新確認白剩 2 氣
+      var g2 = e.groupAndLiberties(white[0].x, white[0].y);
+      var remain = libertyPoints(e, g2.stones);
+      if (remain.length !== 2) continue;
+      // 兩個解各驗證：下後白剩 1 氣、未提子
+      var ok = true, sols = [];
+      for (var s = 0; s < remain.length; s++) {
+        var pr = e.tryPlay(remain[s].x, remain[s].y, B);
+        if (!pr.legal || pr.captured.length !== 0) { ok = false; break; }
+        e.board[remain[s].y][remain[s].x] = B;
+        var after = e.groupAndLiberties(white[0].x, white[0].y).liberties;
+        e.board[remain[s].y][remain[s].x] = EMPTY;
+        if (after !== 1) { ok = false; break; }
+        sols.push(remain[s]);
+      }
+      if (!ok || sols.length !== 2) continue;
+      if (!allHaveLiberties(e, blacks)) continue;
+      return { stones: toStones(white, W).concat(toStones(blacks, B)), turn: B, solutions: sols };
+    }
+    return null;
+  }
+
+  // ---- 逃子：黑被打吃(1 氣)，往唯一的氣延伸逃出 ----
+  function genEscape(rand) {
+    for (var t = 0; t < 300; t++) {
+      var e = newEngine();
+      var cx = 3 + Math.floor(rand() * 7), cy = 3 + Math.floor(rand() * 7);
+      var black = [{ x: cx, y: cy }];
+      if (rand() < 0.3) {
+        var d = DIRS[Math.floor(rand() * 4)];
+        if (e.inBounds(cx + d[0], cy + d[1])) black.push({ x: cx + d[0], y: cy + d[1] });
+      }
+      for (var i = 0; i < black.length; i++) e.board[black[i].y][black[i].x] = B;
+      var g = e.groupAndLiberties(black[0].x, black[0].y);
+      var libs = libertyPoints(e, g.stones);
+      if (libs.length < 2 || libs.length > 4) continue;
+      // 保留一口氣當逃跑點，其餘填白
+      var escIdx = Math.floor(rand() * libs.length);
+      var esc = libs[escIdx];
+      var whites = [];
+      for (var j = 0; j < libs.length; j++) {
+        if (j === escIdx) continue;
+        e.board[libs[j].y][libs[j].x] = W;
+        whites.push(libs[j]);
+      }
+      // 黑此時應為 1 氣（被打吃）
+      if (e.groupAndLiberties(black[0].x, black[0].y).liberties !== 1) continue;
+      // 驗證逃跑點：合法、未提白、逃後氣 >= 2
+      var pr = e.tryPlay(esc.x, esc.y, B);
+      if (!pr.legal || pr.captured.length !== 0) continue;
+      e.board[esc.y][esc.x] = B;
+      var after = e.groupAndLiberties(esc.x, esc.y).liberties;
+      e.board[esc.y][esc.x] = EMPTY;
+      if (after < 2) continue;
+      if (!allHaveLiberties(e, whites)) continue;
+      return { stones: toStones(black, B).concat(toStones(whites, W)), turn: B, solutions: [esc] };
+    }
+    return null;
+  }
+
+  var GENERATORS = { capture: genCapture, atari: genAtari, escape: genEscape };
+
+  var TEXT = {
+    capture: {
+      title: '吃子', concept: '吃子',
+      desc: '白棋只剩一口氣了！輪到你（黑棋），找出那口氣把它吃掉。',
+      hint: '白棋旁邊唯一還空著的點，就是它最後一口氣。',
+      teach: '堵住對方最後一口氣，沒氣的棋就被提走。'
+    },
+    atari: {
+      title: '打吃', concept: '打吃',
+      desc: '輪到你（黑棋），下一手把白棋「打吃」——逼到只剩一口氣。',
+      hint: '白棋還有兩口氣，堵掉其中一口就是打吃。',
+      teach: '把對方逼到只剩一口氣，叫做打吃，下一手就能吃。'
+    },
+    escape: {
+      title: '逃子', concept: '長氣',
+      desc: '你的黑棋被打吃了，只剩一口氣！往哪裡逃可以增加氣、逃出去？',
+      hint: '往還開著、沒有白棋的那個方向延伸。',
+      teach: '往空的方向長出去，自己的氣就變多、逃離被吃。'
+    }
+  };
+
+  // 產生某類別的一組題目（種子固定 → 可重現，星星進度可累積）
+  function genSet(kind, seed, count) {
+    var rand = makeRng(seed);
+    var fn = GENERATORS[kind], tx = TEXT[kind];
+    var out = [];
+    var n = 0, guard = 0;
+    while (out.length < count && guard < count * 20) {
+      guard++;
+      var p = fn(rand);
+      if (!p) continue;
+      n++;
+      out.push({
+        id: kind + '-' + n,
+        title: tx.title + ' · 第 ' + n + ' 題',
+        concept: tx.concept,
+        desc: tx.desc,
+        stones: p.stones,
+        turn: p.turn,
+        solutions: p.solutions,
+        hint: tx.hint,
+        teach: tx.teach
+      });
+    }
+    return out;
+  }
+
+  global.ProblemGen = { genSet: genSet, _gen: GENERATORS, _rng: makeRng };
 })(window);
 
 </script>
@@ -2049,6 +2267,112 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
     'ladder-1': '用連續打吃（征子）一路追著跑，對方怎麼逃氣都補不上，最後被吃。'
   };
 
+  var B2 = 1, W2 = 2;
+  function stn(list, color) { return list.map(function (p) { return { x: p[0], y: p[1], color: color }; }); }
+
+  // ===== 手工精選：活死棋（做活，落子後真的形成兩隻眼，已用引擎驗證）=====
+  var LIFE = [
+    {
+      id: 'lf-straight3h', title: '活棋 · 直三做活', concept: '做活',
+      desc: '中間一排三個空點，被你先佔到正中央，就能切成兩隻眼活棋。輪到你(黑棋)！',
+      stones: stn([[4, 6], [8, 6], [5, 5], [6, 5], [7, 5], [5, 7], [6, 7], [7, 7]], B2),
+      turn: B2, solutions: [{ x: 6, y: 6 }],
+      hint: '下在三個空點的正中央。', teach: '直三的要害在正中央，佔到就左右各一眼、活棋。'
+    },
+    {
+      id: 'lf-straight3v', title: '活棋 · 直三做活（直立）', concept: '做活',
+      desc: '直立的三個空點，一樣搶正中央做出兩隻眼。輪到你(黑棋)！',
+      stones: stn([[6, 4], [6, 8], [5, 5], [5, 6], [5, 7], [7, 5], [7, 6], [7, 7]], B2),
+      turn: B2, solutions: [{ x: 6, y: 6 }],
+      hint: '下在三個空點的正中央。', teach: '不管橫的直的，直三的要害都是正中央。'
+    },
+    {
+      id: 'lf-bent3', title: '活棋 · 彎三做活', concept: '做活',
+      desc: '彎彎的三個空點（L 形），要害是那個轉角。輪到你(黑棋)，佔轉角做兩眼！',
+      stones: stn([[4, 6], [5, 5], [5, 7], [6, 5], [7, 7], [6, 8]], B2),
+      turn: B2, solutions: [{ x: 6, y: 6 }],
+      hint: '下在 L 形的轉角處。', teach: '彎三的要害在轉角，佔到就能分出兩隻眼。'
+    },
+    {
+      id: 'lf-eye', title: '活棋 · 補出第二眼', concept: '做活',
+      desc: '左邊已經有一隻眼了，右邊缺一角。輪到你(黑棋)，補起來做出第二隻眼！',
+      stones: stn([[4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [4, 6], [6, 6], [7, 6], [9, 6], [4, 7], [5, 7], [6, 7], [7, 7], [9, 7]], B2),
+      turn: B2, solutions: [{ x: 8, y: 7 }],
+      hint: '右邊那個快成眼的空點，下面缺一顆黑棋。', teach: '有兩隻眼就永遠吃不掉；補好缺口讓第二隻眼成形。'
+    },
+    {
+      id: 'lf-eye2', title: '活棋 · 補出第二眼（鏡像）', concept: '做活',
+      desc: '這次缺口在另一邊，一樣補好做出兩隻眼讓棋活起來。輪到你(黑棋)！',
+      stones: stn([[3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [3, 6], [5, 6], [6, 6], [8, 6], [3, 7], [5, 7], [6, 7], [7, 7], [8, 7]], B2),
+      turn: B2, solutions: [{ x: 4, y: 7 }],
+      hint: '左邊那個快成眼的空點，下面缺一顆黑棋。', teach: '看清楚哪一邊還缺一角，補起來就是第二隻眼。'
+    }
+  ];
+
+  // ===== 手工精選：手筋（雙打吃，已用引擎驗證同時打吃兩塊）=====
+  var TESUJI = [
+    {
+      id: 'ts-double-1', title: '手筋 · 雙打吃', concept: '雙打吃',
+      desc: '一手同時攻擊兩塊白棋！找出那個「一下打吃到上下兩邊」的點。輪到你(黑棋)。',
+      stones: stn([[6, 5], [6, 7]], W2).concat(stn([[5, 5], [6, 4], [5, 7], [6, 8]], B2)),
+      turn: B2, solutions: [{ x: 6, y: 6 }],
+      hint: '兩顆白棋中間那個點。', teach: '一手同時打吃兩塊（雙打吃），對方只能救一邊，另一邊必被吃。'
+    },
+    {
+      id: 'ts-double-2', title: '手筋 · 雙打吃（橫向）', concept: '雙打吃',
+      desc: '左右兩塊白棋，找出同時打吃兩邊的一手。輪到你(黑棋)。',
+      stones: stn([[6, 6], [8, 6]], W2).concat(stn([[6, 5], [6, 7], [8, 5], [8, 7]], B2)),
+      turn: B2, solutions: [{ x: 7, y: 6 }],
+      hint: '兩塊白棋中間那個點。', teach: '中間一點同時逼近左右兩塊，兩邊都剩一口氣。'
+    },
+    {
+      id: 'ts-double-3', title: '手筋 · 雙打吃（角上）', concept: '雙打吃',
+      desc: '換個位置，一樣找出同時打吃兩塊的關鍵點。輪到你(黑棋)。',
+      stones: stn([[3, 4], [3, 6]], W2).concat(stn([[2, 4], [3, 3], [2, 6], [3, 7]], B2)),
+      turn: B2, solutions: [{ x: 3, y: 5 }],
+      hint: '兩顆白棋中間那個點。', teach: '雙打吃在任何位置都成立，先看有沒有「一點打兩塊」。'
+    },
+    {
+      id: 'ts-double-4', title: '手筋 · 雙打吃（下邊）', concept: '雙打吃',
+      desc: '下邊也有機會，找出那一手雙打吃。輪到你(黑棋)。',
+      stones: stn([[4, 9], [6, 9]], W2).concat(stn([[4, 8], [4, 10], [6, 8], [6, 10]], B2)),
+      turn: B2, solutions: [{ x: 5, y: 9 }],
+      hint: '兩塊白棋中間那個點。', teach: '養成習慣：先找有沒有雙打吃這種一石二鳥的好手。'
+    }
+  ];
+
+  // ===== 手工精選：定石／佈局（開局方向的基本觀念）=====
+  var JOSEKI = [
+    {
+      id: 'jo-corner', title: '佈局 · 先佔角', concept: '佈局',
+      desc: '圍棋開局，先搶「角」最有效率！下在盤角的星位（有小黑點的角）。輪到你(黑棋)。',
+      stones: [], turn: B2,
+      solutions: [{ x: 3, y: 3 }, { x: 9, y: 3 }, { x: 3, y: 9 }, { x: 9, y: 9 }],
+      hint: '四個角的星位都可以。', teach: '金角銀邊草肚皮：先佔角、再守邊，中腹最難圍。'
+    },
+    {
+      id: 'jo-last-corner', title: '佈局 · 搶最後一個空角', concept: '佈局',
+      desc: '三個角都有棋了，剩下一個空角最大，先去把它佔起來！輪到你(黑棋)。',
+      stones: stn([[3, 3], [9, 3], [3, 9]], B2), turn: B2,
+      solutions: [{ x: 9, y: 9 }],
+      hint: '右下角那個還空著的星位。', teach: '空的角比守邊、圍中腹都大，開局優先把角佔滿。'
+    }
+  ];
+
+  // ===== 分類題庫（生成題 + 手工精選）=====
+  function buildCategories() {
+    var gen = global.ProblemGen;
+    return [
+      { key: 'basic', name: '基礎入門', level: '20~18級', problems: PROBLEMS },
+      { key: 'capture', name: '吃子', level: '18~15級', problems: gen ? gen.genSet('capture', 1001, 15) : [] },
+      { key: 'atari', name: '打吃', level: '17~14級', problems: gen ? gen.genSet('atari', 2002, 15) : [] },
+      { key: 'escape', name: '逃子', level: '16~13級', problems: gen ? gen.genSet('escape', 3003, 15) : [] },
+      { key: 'life', name: '活死棋', level: '13~10級', problems: LIFE },
+      { key: 'tesuji', name: '手筋', level: '14~11級', problems: TESUJI },
+      { key: 'joseki', name: '定石·佈局', level: '15~11級', problems: JOSEKI }
+    ];
+  }
+
   var STORE_KEY = 'chengcheng-go-stars';
 
   function PracticeController(ui) {
@@ -2058,12 +2382,42 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
     this.index = 0;
     this.solved = false;
     this.store = this.loadStore();   // { 題目id: true } 已過關紀錄
+    this.categories = buildCategories();
+    this.catIndex = 0;
+    this.problems = this.categories[0].problems;
     var self = this;
     this.renderer.onPoint(function (x, y) { self.handleClick(x, y); });
     this.bind();
+    this.populateCategories();
     this.renderStars();
     this.load(this.firstUnsolved());
   }
+
+  // 目前分類
+  PracticeController.prototype.category = function () { return this.categories[this.catIndex]; };
+
+  // 填入分類下拉選單
+  PracticeController.prototype.populateCategories = function () {
+    var sel = this.ui.categorySel;
+    if (!sel) return;
+    sel.innerHTML = '';
+    for (var i = 0; i < this.categories.length; i++) {
+      var c = this.categories[i];
+      var o = document.createElement('option');
+      o.value = String(i);
+      o.textContent = c.name + '（' + c.level + '·' + c.problems.length + '題）';
+      sel.appendChild(o);
+    }
+    sel.value = String(this.catIndex);
+  };
+
+  PracticeController.prototype.switchCategory = function (idx) {
+    if (idx < 0 || idx >= this.categories.length) return;
+    this.catIndex = idx;
+    this.problems = this.categories[idx].problems;
+    if (this.ui.categorySel) this.ui.categorySel.value = String(idx);
+    this.load(this.firstUnsolved());
+  };
 
   // ---- 進度存檔（localStorage，換頁/關掉重開都記得） ----
   PracticeController.prototype.loadStore = function () {
@@ -2075,12 +2429,13 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
     catch (e) { /* 無痕模式等情況忽略 */ }
   };
   PracticeController.prototype.starCount = function () {
-    var n = 0;
-    for (var i = 0; i < PROBLEMS.length; i++) if (this.store[PROBLEMS[i].id]) n++;
+    var n = 0, ps = this.problems;
+    for (var i = 0; i < ps.length; i++) if (this.store[ps[i].id]) n++;
     return n;
   };
   PracticeController.prototype.firstUnsolved = function () {
-    for (var i = 0; i < PROBLEMS.length; i++) if (!this.store[PROBLEMS[i].id]) return i;
+    var ps = this.problems;
+    for (var i = 0; i < ps.length; i++) if (!this.store[ps[i].id]) return i;
     return 0;
   };
 
@@ -2089,13 +2444,13 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
     var el = this.ui.starsEl;
     if (!el) return;
     el.innerHTML = '';
-    var self = this;
-    for (var i = 0; i < PROBLEMS.length; i++) {
+    var self = this, ps = this.problems;
+    for (var i = 0; i < ps.length; i++) {
       var s = document.createElement('button');
-      var done = !!this.store[PROBLEMS[i].id];
+      var done = !!this.store[ps[i].id];
       s.className = 'star' + (done ? ' done' : '') + (i === this.index ? ' current' : '');
       s.textContent = done ? (this.ui.eink ? '★' : '⭐') : (i + 1);
-      s.title = PROBLEMS[i].title;
+      s.title = ps[i].title;
       (function (idx) { s.addEventListener('click', function () { self.load(idx); }); })(i);
       el.appendChild(s);
     }
@@ -2103,6 +2458,11 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
 
   PracticeController.prototype.bind = function () {
     var self = this, ui = this.ui;
+    if (ui.categorySel) {
+      ui.categorySel.addEventListener('change', function () {
+        self.switchCategory(parseInt(ui.categorySel.value, 10));
+      });
+    }
     ui.prevBtn.addEventListener('click', function () { self.load(self.index - 1); });
     ui.nextBtn.addEventListener('click', function () { self.load(self.index + 1); });
     ui.retryBtn.addEventListener('click', function () { self.load(self.index); });
@@ -2117,11 +2477,12 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
   };
 
   PracticeController.prototype.load = function (i) {
+    var ps = this.problems;
     if (i < 0) i = 0;
-    if (i >= PROBLEMS.length) i = PROBLEMS.length - 1;
+    if (i >= ps.length) i = ps.length - 1;
     this.index = i;
     this.solved = false;
-    var p = PROBLEMS[i];
+    var p = ps[i];
     this.engine.setup(p.stones, p.turn);
     this.renderer.setMarks(p.marks || []);
     this.renderer.draw();
@@ -2136,9 +2497,9 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
     } else {
       this.setStatus('輪到你（黑棋），點棋盤下一手 👆', '');
     }
-    this.ui.progressEl.textContent = '第 ' + (i + 1) + ' / ' + PROBLEMS.length + ' 關　⭐ 已得 ' + this.starCount() + ' 顆星';
+    this.ui.progressEl.textContent = this.category().name + '　第 ' + (i + 1) + ' / ' + ps.length + ' 題　⭐ 已得 ' + this.starCount() + '/' + ps.length;
     this.ui.prevBtn.disabled = (i === 0);
-    this.ui.nextBtn.disabled = (i === PROBLEMS.length - 1);
+    this.ui.nextBtn.disabled = (i === ps.length - 1);
     this.renderStars();
   };
 
@@ -2150,7 +2511,7 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
 
   PracticeController.prototype.handleClick = function (x, y) {
     if (this.solved) return;
-    var p = PROBLEMS[this.index];
+    var p = this.problems[this.index];
     var isSolution = p.solutions.some(function (s) { return s.x === x && s.y === y; });
 
     var res = this.engine.play(x, y);
@@ -2168,14 +2529,16 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
       this.saveStore();
       this.renderStars();
       var got = this.starCount();
+      var total = this.problems.length;
       var msg = '🎉 答對了！' + (res.captured.length ? '成功吃掉 ' + res.captured.length + ' 顆白棋！' : '漂亮的一手！');
-      if (newStar) msg += ' ⭐ 得到一顆星（' + got + '/' + PROBLEMS.length + '）';
-      var allClear = (got === PROBLEMS.length);
-      if (allClear) msg = '🏆 全部 ' + PROBLEMS.length + ' 關都通關了！澂澂好棒！🎉';
+      if (newStar) msg += ' ⭐ 得到一顆星（' + got + '/' + total + '）';
+      var allClear = (got === total);
+      if (allClear) msg = '🏆「' + this.category().name + '」' + total + ' 題全部通關！澂澂好棒！🎉';
       this.setStatus(msg, 'ok');
-      this.ui.progressEl.textContent = '第 ' + (this.index + 1) + ' / ' + PROBLEMS.length + ' 關　⭐ 已得 ' + got + ' 顆星';
-      if (this.ui.teachEl && TEACH[p.id]) {
-        this.ui.teachEl.textContent = '📖 這一步的目的：' + TEACH[p.id];
+      this.ui.progressEl.textContent = this.category().name + '　第 ' + (this.index + 1) + ' / ' + total + ' 題　⭐ 已得 ' + got + '/' + total;
+      var teachText = p.teach || TEACH[p.id];
+      if (this.ui.teachEl && teachText) {
+        this.ui.teachEl.textContent = '📖 這一步的目的：' + teachText;
       }
       celebrate(this.ui.canvas);
       // 誇張過關特效
@@ -2213,6 +2576,7 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
 
   global.PracticeController = PracticeController;
   global.GO_PROBLEMS = PROBLEMS;
+  global.GO_BUILD_CATEGORIES = buildCategories;
 })(window);
 
 </script>
@@ -2264,6 +2628,7 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
       hintEl: document.getElementById('pr-hint'),
       statusEl: document.getElementById('pr-status'),
       teachEl: document.getElementById('pr-teach'),
+      categorySel: document.getElementById('pr-category'),
       progressEl: document.getElementById('pr-progress'),
       starsEl: document.getElementById('pr-stars'),
       prevBtn: document.getElementById('pr-prev'),

@@ -99,6 +99,7 @@
         <canvas id="pr-canvas" width="560" height="560"></canvas>
       </div>
       <div class="panel">
+        <select id="pr-category" class="cat-select"></select>
         <div class="progress" id="pr-progress">進度 1 / 13</div>
         <div class="stars" id="pr-stars"></div>
         <h3 class="prob-title" id="pr-title">題目</h3>
@@ -124,6 +125,7 @@
   <script src="js/render.js"></script>
   <script src="js/ai.js"></script>
   <script src="js/teach.js"></script>
+  <script src="js/problems-gen.js"></script>
   <script src="js/fx.js"></script>
   <script src="js/vs.js"></script>
   <script src="js/practice.js"></script>
@@ -175,6 +177,7 @@
       hintEl: document.getElementById('pr-hint'),
       statusEl: document.getElementById('pr-status'),
       teachEl: document.getElementById('pr-teach'),
+      categorySel: document.getElementById('pr-category'),
       progressEl: document.getElementById('pr-progress'),
       starsEl: document.getElementById('pr-stars'),
       prevBtn: document.getElementById('pr-prev'),

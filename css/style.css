@@ -224,6 +224,7 @@ select {
   display: none;
 }
 .hint.show { display: block; }
+.cat-select { font-weight: 700; margin-bottom: 6px; }
 .progress { text-align: center; font-weight: 700; margin: 6px 0; opacity: .7; }
 
 /* 星星關卡列 */
