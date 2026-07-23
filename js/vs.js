@@ -31,6 +31,7 @@
     this.level = ui.levelSel ? parseInt(ui.levelSel.value, 10) : 1;
     this.ai = new global.GoAI(this.engine, LEVELS[this.level].strength);
     this.handicap = ui.handicapSel ? parseInt(ui.handicapSel.value, 10) : 0;
+    this.teachOff = ui.teachToggle ? !ui.teachToggle.checked : false;
     this.mode = 'ai';        // 'ai' | 'human'
     this.aiColor = W;        // 電腦執白，玩家執黑先
     this.gameOver = false;
@@ -61,6 +62,12 @@
         self.restart();
       });
     }
+    if (ui.teachToggle) {
+      ui.teachToggle.addEventListener('change', function () {
+        self.teachOff = !ui.teachToggle.checked;
+        if (self.teachOff && ui.teachEl) ui.teachEl.textContent = '';
+      });
+    }
     ui.undoBtn.addEventListener('click', function () { self.undo(); });
     ui.passBtn.addEventListener('click', function () { self.pass(); });
     ui.resignBtn.addEventListener('click', function () { self.resign(); });
@@ -72,6 +79,7 @@
     this.gameOver = false;
     this.thinking = false;
     this.ui.scoreEl.textContent = '';
+    if (this.ui.teachEl) this.ui.teachEl.textContent = '';
 
     // 讓子（僅對電腦時生效）：黑先擺讓子，之後白(電腦)先下
     var handInfo = '';
@@ -120,12 +128,12 @@
       return;
     }
     this.renderer.draw();
-    this.afterMove(res);
+    this.afterMove(res, 'you');
 
     if (!this.gameOver && this.isAiTurn()) this.aiMove();
   };
 
-  VsController.prototype.afterMove = function (res) {
+  VsController.prototype.afterMove = function (res, who) {
     this.refresh();
     if (res.captured && res.captured.length) {
       this.setStatus('提子 ' + res.captured.length + ' 顆！', 'ok');
@@ -133,6 +141,19 @@
     } else {
       this.setStatus('', '');
     }
+    this.showTeach(res.captured ? res.captured.length : 0, who);
+  };
+
+  // 解說：分析剛剛這一手的目的（你的或電腦的），顯示白話說明
+  VsController.prototype.showTeach = function (captured, who) {
+    var el = this.ui.teachEl;
+    if (!el) return;
+    if (this.teachOff || !global.Teach) { el.textContent = ''; return; }
+    var lm = this.engine.lastMove;
+    if (!lm) { el.textContent = ''; return; }
+    var c = global.Teach.commentMove(this.engine, lm.x, lm.y, lm.color, captured);
+    var subj = who === 'ai' ? '電腦這手 🤖' : '你這手 🙂';
+    el.textContent = c.icon + ' ' + subj + '：' + c.text;
   };
 
   // 吃子小特效：每顆被提的棋位置噴一撮彩帶 + 啵一聲
@@ -160,7 +181,7 @@
       var res = self.engine.play(mv.x, mv.y);
       self.renderer.draw();
       self.thinking = false;
-      self.afterMove(res);
+      self.afterMove(res, 'ai');
     }, 450);
   };
 

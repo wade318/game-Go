@@ -183,6 +183,27 @@ select {
 
 .score { margin-top: 8px; font-size: 13px; opacity: .7; text-align: center; }
 
+/* 解說框 */
+.teach {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #eef4ff;
+  color: #234;
+  font-size: 14px;
+  line-height: 1.55;
+  min-height: 0;
+}
+.teach:empty { display: none; }
+.teach-toggle {
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+  opacity: .8;
+  cursor: pointer;
+  user-select: none;
+}
+
 /* 練習頁 */
 .prob-title { margin: 0 0 8px; font-size: 20px; color: var(--red-dark); }
 .prob-desc { font-size: 15px; line-height: 1.6; }
@@ -373,6 +394,8 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
         </div>
 
         <div class="status" id="vs-status"></div>
+        <div class="teach" id="vs-teach"></div>
+        <label class="teach-toggle"><input type="checkbox" id="vs-teach-toggle" checked> 💬 顯示每手解說</label>
         <div class="score" id="vs-score"></div>
       </div>
     </div>
@@ -391,6 +414,7 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
         <p class="prob-desc" id="pr-desc">說明</p>
         <div class="hint" id="pr-hint"></div>
         <div class="status" id="pr-status"></div>
+        <div class="teach" id="pr-teach"></div>
         <div class="row">
           <button class="btn gray" id="pr-prev">⬅️ 上一題</button>
           <button class="btn" id="pr-retry">🔁 重做</button>
@@ -1058,6 +1082,65 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
 
 </script>
   <script>
+/* 解說教學 —— 純規則分析盤面，產生白話解說（不需 LLM、不連網）
+   對外：window.Teach.commentMove(engine, x, y, color, captured) → { icon, text }
+   分析「剛下在 (x,y) 的一手」的戰術意義。engine 需為落子後狀態。 */
+
+(function (global) {
+  'use strict';
+
+  var EMPTY = 0, B = 1, W = 2;
+  var dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+
+  function opp(c) { return c === B ? W : B; }
+
+  function commentMove(engine, x, y, color, captured) {
+    var o = opp(color);
+    var atari = false;        // 是否打吃到對方
+    var friendly = 0;         // 相鄰己方棋子數
+    var enemyAdj = 0;         // 相鄰對方棋子數
+
+    for (var i = 0; i < 4; i++) {
+      var nx = x + dirs[i][0], ny = y + dirs[i][1];
+      if (!engine.inBounds(nx, ny)) continue;
+      var v = engine.get(nx, ny);
+      if (v === color) {
+        friendly++;
+      } else if (v === o) {
+        enemyAdj++;
+        var g = engine.groupAndLiberties(nx, ny);
+        if (g.liberties === 1) atari = true;
+      }
+    }
+
+    var myLibs = engine.get(x, y) === EMPTY ? 0 : engine.groupAndLiberties(x, y).liberties;
+
+    if (captured > 0) {
+      return { icon: '🎉', text: '提子 ' + captured + ' 顆！對方那塊棋沒有氣了，就被拿走。' };
+    }
+    if (atari) {
+      return { icon: '⚠️', text: '打吃！讓對方只剩最後 1 口氣，下一手就可能把它吃掉。' };
+    }
+    if (myLibs === 1) {
+      return { icon: '😮', text: '小心，這手自己只剩 1 口氣，容易被對方反過來吃掉。' };
+    }
+    if (friendly >= 2) {
+      return { icon: '💪', text: '連接：把附近幾顆棋接成更強的一塊，不容易被切斷。' };
+    }
+    if (friendly === 1) {
+      return { icon: '➡️', text: '延伸：讓自己的棋變長、氣變多，比較安全。' };
+    }
+    if (enemyAdj > 0) {
+      return { icon: '⚔️', text: '貼著對方下，開始跟它搶氣、逼近它。' };
+    }
+    return { icon: '🗺️', text: '先在空曠的地方佔一塊地盤，把勢力範圍圍大。' };
+  }
+
+  global.Teach = { commentMove: commentMove };
+})(window);
+
+</script>
+  <script>
 /* 過關誇張特效 —— 彩帶爆炸 + 星星煙火 + 大字橫幅 + 震動 + 叮咚音效
    全部純前端、免網路。對外：window.FX.celebrate({ big: false, text: '過關囉！' }) */
 
@@ -1321,6 +1404,7 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
     this.level = ui.levelSel ? parseInt(ui.levelSel.value, 10) : 1;
     this.ai = new global.GoAI(this.engine, LEVELS[this.level].strength);
     this.handicap = ui.handicapSel ? parseInt(ui.handicapSel.value, 10) : 0;
+    this.teachOff = ui.teachToggle ? !ui.teachToggle.checked : false;
     this.mode = 'ai';        // 'ai' | 'human'
     this.aiColor = W;        // 電腦執白，玩家執黑先
     this.gameOver = false;
@@ -1351,6 +1435,12 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
         self.restart();
       });
     }
+    if (ui.teachToggle) {
+      ui.teachToggle.addEventListener('change', function () {
+        self.teachOff = !ui.teachToggle.checked;
+        if (self.teachOff && ui.teachEl) ui.teachEl.textContent = '';
+      });
+    }
     ui.undoBtn.addEventListener('click', function () { self.undo(); });
     ui.passBtn.addEventListener('click', function () { self.pass(); });
     ui.resignBtn.addEventListener('click', function () { self.resign(); });
@@ -1362,6 +1452,7 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
     this.gameOver = false;
     this.thinking = false;
     this.ui.scoreEl.textContent = '';
+    if (this.ui.teachEl) this.ui.teachEl.textContent = '';
 
     // 讓子（僅對電腦時生效）：黑先擺讓子，之後白(電腦)先下
     var handInfo = '';
@@ -1410,12 +1501,12 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
       return;
     }
     this.renderer.draw();
-    this.afterMove(res);
+    this.afterMove(res, 'you');
 
     if (!this.gameOver && this.isAiTurn()) this.aiMove();
   };
 
-  VsController.prototype.afterMove = function (res) {
+  VsController.prototype.afterMove = function (res, who) {
     this.refresh();
     if (res.captured && res.captured.length) {
       this.setStatus('提子 ' + res.captured.length + ' 顆！', 'ok');
@@ -1423,6 +1514,19 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
     } else {
       this.setStatus('', '');
     }
+    this.showTeach(res.captured ? res.captured.length : 0, who);
+  };
+
+  // 解說：分析剛剛這一手的目的（你的或電腦的），顯示白話說明
+  VsController.prototype.showTeach = function (captured, who) {
+    var el = this.ui.teachEl;
+    if (!el) return;
+    if (this.teachOff || !global.Teach) { el.textContent = ''; return; }
+    var lm = this.engine.lastMove;
+    if (!lm) { el.textContent = ''; return; }
+    var c = global.Teach.commentMove(this.engine, lm.x, lm.y, lm.color, captured);
+    var subj = who === 'ai' ? '電腦這手 🤖' : '你這手 🙂';
+    el.textContent = c.icon + ' ' + subj + '：' + c.text;
   };
 
   // 吃子小特效：每顆被提的棋位置噴一撮彩帶 + 啵一聲
@@ -1450,7 +1554,7 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
       var res = self.engine.play(mv.x, mv.y);
       self.renderer.draw();
       self.thinking = false;
-      self.afterMove(res);
+      self.afterMove(res, 'ai');
     }, 450);
   };
 
@@ -1755,6 +1859,23 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
     }
   ];
 
+  // 各關「這一步的目的」解說（答對後顯示）
+  var TEACH = {
+    'liberty-1': '堵住對方最後一口「氣」。棋子周圍的空點就是氣，氣被堵光就會被提走。',
+    'atari-1': '把對方逼到只剩 1 口氣，這叫「打吃」，下一手就能吃掉它。',
+    'capture-2': '兩顆相連的棋共用氣，堵住它們共同的最後一口氣，就能一次全吃。',
+    'escape-1': '往還開著的那口氣延伸，讓自己這塊棋氣變多、逃離被吃。',
+    'connect-1': '補住中間的斷點，把兩塊棋接成一塊就切不斷、更堅固。',
+    'eye-1': '補好缺口做出第二隻「眼」。有兩隻眼的棋永遠吃不掉，這叫活棋。',
+    'edge-capture-1': '棋盤邊上氣本來就少，堵住最後一口氣就能提子。',
+    'corner-capture-2': '角落是氣最少的地方，堵住共同的最後一口氣，兩顆一起提走。',
+    'capture-three-1': '一排三顆共用氣，堵掉最後一口氣就能一次吃三顆。',
+    'double-atari-1': '一手同時打吃兩塊棋（雙打吃），對方只能救一邊，另一邊一定被吃。',
+    'escape-two-1': '帶著被打吃的兩顆往唯一的活路延伸，一起長出更多氣。',
+    'life-vital-1': '搶下正中央的要點，把大空間切成兩隻眼，這塊棋就活了。',
+    'ladder-1': '用連續打吃（征子）一路追著跑，對方怎麼逃氣都補不上，最後被吃。'
+  };
+
   var STORE_KEY = 'chengcheng-go-stars';
 
   function PracticeController(ui) {
@@ -1836,6 +1957,7 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
     this.ui.descEl.textContent = p.desc;
     this.ui.hintEl.textContent = '';
     this.ui.hintEl.classList.remove('show');
+    if (this.ui.teachEl) this.ui.teachEl.textContent = '';
     if (this.store[p.id]) {
       this.setStatus('⭐ 這一關已經通過囉！想再玩一次就直接下正解 👆', 'ok');
     } else {
@@ -1879,6 +2001,9 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
       if (allClear) msg = '🏆 全部 ' + PROBLEMS.length + ' 關都通關了！澂澂好棒！🎉';
       this.setStatus(msg, 'ok');
       this.ui.progressEl.textContent = '第 ' + (this.index + 1) + ' / ' + PROBLEMS.length + ' 關　⭐ 已得 ' + got + ' 顆星';
+      if (this.ui.teachEl && TEACH[p.id]) {
+        this.ui.teachEl.textContent = '📖 這一步的目的：' + TEACH[p.id];
+      }
       celebrate(this.ui.canvas);
       // 誇張過關特效
       var wrap = this.ui.canvas.parentNode;
@@ -1937,6 +2062,8 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
       capBlackEl: document.getElementById('vs-cap-black'),
       capWhiteEl: document.getElementById('vs-cap-white'),
       statusEl: document.getElementById('vs-status'),
+      teachEl: document.getElementById('vs-teach'),
+      teachToggle: document.getElementById('vs-teach-toggle'),
       scoreEl: document.getElementById('vs-score'),
       modeSel: document.getElementById('vs-mode'),
       levelSel: document.getElementById('vs-level'),
@@ -1954,6 +2081,7 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
       descEl: document.getElementById('pr-desc'),
       hintEl: document.getElementById('pr-hint'),
       statusEl: document.getElementById('pr-status'),
+      teachEl: document.getElementById('pr-teach'),
       progressEl: document.getElementById('pr-progress'),
       starsEl: document.getElementById('pr-stars'),
       prevBtn: document.getElementById('pr-prev'),

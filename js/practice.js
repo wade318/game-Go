@@ -242,6 +242,23 @@
     }
   ];
 
+  // 各關「這一步的目的」解說（答對後顯示）
+  var TEACH = {
+    'liberty-1': '堵住對方最後一口「氣」。棋子周圍的空點就是氣，氣被堵光就會被提走。',
+    'atari-1': '把對方逼到只剩 1 口氣，這叫「打吃」，下一手就能吃掉它。',
+    'capture-2': '兩顆相連的棋共用氣，堵住它們共同的最後一口氣，就能一次全吃。',
+    'escape-1': '往還開著的那口氣延伸，讓自己這塊棋氣變多、逃離被吃。',
+    'connect-1': '補住中間的斷點，把兩塊棋接成一塊就切不斷、更堅固。',
+    'eye-1': '補好缺口做出第二隻「眼」。有兩隻眼的棋永遠吃不掉，這叫活棋。',
+    'edge-capture-1': '棋盤邊上氣本來就少，堵住最後一口氣就能提子。',
+    'corner-capture-2': '角落是氣最少的地方，堵住共同的最後一口氣，兩顆一起提走。',
+    'capture-three-1': '一排三顆共用氣，堵掉最後一口氣就能一次吃三顆。',
+    'double-atari-1': '一手同時打吃兩塊棋（雙打吃），對方只能救一邊，另一邊一定被吃。',
+    'escape-two-1': '帶著被打吃的兩顆往唯一的活路延伸，一起長出更多氣。',
+    'life-vital-1': '搶下正中央的要點，把大空間切成兩隻眼，這塊棋就活了。',
+    'ladder-1': '用連續打吃（征子）一路追著跑，對方怎麼逃氣都補不上，最後被吃。'
+  };
+
   var STORE_KEY = 'chengcheng-go-stars';
 
   function PracticeController(ui) {
@@ -323,6 +340,7 @@
     this.ui.descEl.textContent = p.desc;
     this.ui.hintEl.textContent = '';
     this.ui.hintEl.classList.remove('show');
+    if (this.ui.teachEl) this.ui.teachEl.textContent = '';
     if (this.store[p.id]) {
       this.setStatus('⭐ 這一關已經通過囉！想再玩一次就直接下正解 👆', 'ok');
     } else {
@@ -366,6 +384,9 @@
       if (allClear) msg = '🏆 全部 ' + PROBLEMS.length + ' 關都通關了！澂澂好棒！🎉';
       this.setStatus(msg, 'ok');
       this.ui.progressEl.textContent = '第 ' + (this.index + 1) + ' / ' + PROBLEMS.length + ' 關　⭐ 已得 ' + got + ' 顆星';
+      if (this.ui.teachEl && TEACH[p.id]) {
+        this.ui.teachEl.textContent = '📖 這一步的目的：' + TEACH[p.id];
+      }
       celebrate(this.ui.canvas);
       // 誇張過關特效
       var wrap = this.ui.canvas.parentNode;

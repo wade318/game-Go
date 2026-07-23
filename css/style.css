@@ -172,6 +172,27 @@ select {
 
 .score { margin-top: 8px; font-size: 13px; opacity: .7; text-align: center; }
 
+/* 解說框 */
+.teach {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #eef4ff;
+  color: #234;
+  font-size: 14px;
+  line-height: 1.55;
+  min-height: 0;
+}
+.teach:empty { display: none; }
+.teach-toggle {
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+  opacity: .8;
+  cursor: pointer;
+  user-select: none;
+}
+
 /* 練習頁 */
 .prob-title { margin: 0 0 8px; font-size: 20px; color: var(--red-dark); }
 .prob-desc { font-size: 15px; line-height: 1.6; }

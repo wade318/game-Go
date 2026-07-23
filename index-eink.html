@@ -70,6 +70,8 @@
         </div>
 
         <div class="status" id="vs-status"></div>
+        <div class="teach" id="vs-teach"></div>
+        <label class="teach-toggle"><input type="checkbox" id="vs-teach-toggle" checked> 顯示每手解說</label>
         <div class="score" id="vs-score"></div>
       </div>
     </div>
@@ -88,6 +90,7 @@
         <p class="prob-desc" id="pr-desc">說明</p>
         <div class="hint" id="pr-hint"></div>
         <div class="status" id="pr-status"></div>
+        <div class="teach" id="pr-teach"></div>
         <div class="row">
           <button class="btn gray" id="pr-prev">上一題</button>
           <button class="btn" id="pr-retry">重做</button>
@@ -105,6 +108,7 @@
   <script src="js/engine.js"></script>
   <script src="js/render.js"></script>
   <script src="js/ai.js"></script>
+  <script src="js/teach.js"></script>
   <script src="js/vs.js"></script>
   <script src="js/practice.js"></script>
   <script>
@@ -127,6 +131,8 @@
       capBlackEl: document.getElementById('vs-cap-black'),
       capWhiteEl: document.getElementById('vs-cap-white'),
       statusEl: document.getElementById('vs-status'),
+      teachEl: document.getElementById('vs-teach'),
+      teachToggle: document.getElementById('vs-teach-toggle'),
       scoreEl: document.getElementById('vs-score'),
       modeSel: document.getElementById('vs-mode'),
       levelSel: document.getElementById('vs-level'),
@@ -145,6 +151,7 @@
       descEl: document.getElementById('pr-desc'),
       hintEl: document.getElementById('pr-hint'),
       statusEl: document.getElementById('pr-status'),
+      teachEl: document.getElementById('pr-teach'),
       progressEl: document.getElementById('pr-progress'),
       starsEl: document.getElementById('pr-stars'),
       prevBtn: document.getElementById('pr-prev'),
