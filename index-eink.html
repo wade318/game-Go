@@ -62,6 +62,7 @@
 
         <div class="row">
           <button class="btn hint" id="vs-hint">提示一手</button>
+          <button class="btn" id="vs-replay">覆盤</button>
         </div>
         <div class="row">
           <button class="btn gray" id="vs-undo">悔棋</button>
@@ -76,6 +77,17 @@
         <div class="teach" id="vs-teach"></div>
         <label class="teach-toggle"><input type="checkbox" id="vs-teach-toggle" checked> 顯示每手解說</label>
         <div class="score" id="vs-score"></div>
+
+        <div class="replay-bar" id="vs-replay-bar" style="display:none">
+          <div class="replay-info" id="vs-replay-info"></div>
+          <div class="row">
+            <button class="btn gray" id="vs-rp-first">⏮ 開頭</button>
+            <button class="btn gray" id="vs-rp-prev">◀ 上一手</button>
+            <button class="btn gray" id="vs-rp-next">下一手 ▶</button>
+            <button class="btn gray" id="vs-rp-last">最後 ⏭</button>
+          </div>
+          <button class="btn red" id="vs-rp-exit">✖ 離開覆盤</button>
+        </div>
       </div>
     </div>
   </section>
@@ -141,6 +153,14 @@
       levelSel: document.getElementById('vs-level'),
       handicapSel: document.getElementById('vs-handicap'),
       hintBtn: document.getElementById('vs-hint'),
+      replayBtn: document.getElementById('vs-replay'),
+      replayBar: document.getElementById('vs-replay-bar'),
+      replayInfo: document.getElementById('vs-replay-info'),
+      rpFirst: document.getElementById('vs-rp-first'),
+      rpPrev: document.getElementById('vs-rp-prev'),
+      rpNext: document.getElementById('vs-rp-next'),
+      rpLast: document.getElementById('vs-rp-last'),
+      rpExit: document.getElementById('vs-rp-exit'),
       undoBtn: document.getElementById('vs-undo'),
       passBtn: document.getElementById('vs-pass'),
       resignBtn: document.getElementById('vs-resign'),

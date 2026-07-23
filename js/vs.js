@@ -32,6 +32,8 @@
     this.ai = new global.GoAI(this.engine, LEVELS[this.level].strength);
     this.handicap = ui.handicapSel ? parseInt(ui.handicapSel.value, 10) : 0;
     this.teachOff = ui.teachToggle ? !ui.teachToggle.checked : false;
+    this.replaying = false;
+    this.replayIdx = 0;
     this.mode = 'ai';        // 'ai' | 'human'
     this.aiColor = W;        // 電腦執白，玩家執黑先
     this.gameOver = false;
@@ -69,6 +71,12 @@
       });
     }
     if (ui.hintBtn) ui.hintBtn.addEventListener('click', function () { self.hint(); });
+    if (ui.replayBtn) ui.replayBtn.addEventListener('click', function () { self.enterReplay(); });
+    if (ui.rpFirst) ui.rpFirst.addEventListener('click', function () { self.replayGoto(0); });
+    if (ui.rpPrev) ui.rpPrev.addEventListener('click', function () { self.replayGoto(self.replayIdx - 1); });
+    if (ui.rpNext) ui.rpNext.addEventListener('click', function () { self.replayGoto(self.replayIdx + 1); });
+    if (ui.rpLast) ui.rpLast.addEventListener('click', function () { self.replayGoto(self.engine.record.length - 1); });
+    if (ui.rpExit) ui.rpExit.addEventListener('click', function () { self.exitReplay(); });
     ui.undoBtn.addEventListener('click', function () { self.undo(); });
     ui.passBtn.addEventListener('click', function () { self.pass(); });
     ui.resignBtn.addEventListener('click', function () { self.resign(); });
@@ -76,6 +84,7 @@
   };
 
   VsController.prototype.restart = function () {
+    if (this.replaying) this.exitReplay(true);
     this.engine.reset();
     this.gameOver = false;
     this.thinking = false;
@@ -91,6 +100,7 @@
       handInfo = '（讓 ' + this.handicap + ' 子）';
     }
 
+    this.engine.recordReset();    // 以目前盤面（含讓子）為覆盤起點
     this.renderer.setMarks([]);   // 清掉提示標記並重繪
     this.refresh();
 
@@ -120,7 +130,7 @@
   };
 
   VsController.prototype.handleClick = function (x, y) {
-    if (this.gameOver || this.thinking) return;
+    if (this.gameOver || this.thinking || this.replaying) return;
     if (this.isAiTurn()) return;   // 電腦回合不接受點擊
 
     var res = this.engine.play(x, y);
@@ -136,7 +146,7 @@
 
   // 提示一手：用強 AI 評估幫目前該下的一方找個好點，標在盤上並解說為什麼
   VsController.prototype.hint = function () {
-    if (this.gameOver || this.thinking) return;
+    if (this.gameOver || this.thinking || this.replaying) return;
     if (this.isAiTurn()) { this.setStatus('現在是電腦回合，等牠下完再按提示 🙂', 'warn'); return; }
     var color = this.engine.turn;
     var helper = new global.GoAI(this.engine, 5);
@@ -156,6 +166,77 @@
     if (this.ui.teachEl && !this.teachOff) {
       this.ui.teachEl.textContent = comment.icon + ' 為什麼：' + comment.text;
     }
+  };
+
+  // ===== 覆盤（棋譜回顧）=====
+  VsController.prototype.enterReplay = function () {
+    if (this.thinking) return;
+    var rec = this.engine.record;
+    if (!rec || rec.length < 2) {
+      this.setStatus('還沒有棋步可以覆盤，先下幾手吧 🙂', 'warn');
+      return;
+    }
+    // 保存目前實戰盤面，覆盤結束後還原
+    this.savedLive = {
+      board: this.engine.board.map(function (r) { return r.slice(); }),
+      lastMove: this.engine.lastMove,
+      turn: this.engine.turn,
+      captures: { 1: this.engine.captures[1], 2: this.engine.captures[2] }
+    };
+    this.replaying = true;
+    this.replayIdx = rec.length - 1;
+    if (this.ui.replayBar) this.ui.replayBar.style.display = 'block';
+    this.renderReplay();
+  };
+
+  VsController.prototype.exitReplay = function (silent) {
+    if (!this.replaying) return;
+    var s = this.savedLive;
+    if (s) {
+      this.engine.board = s.board.map(function (r) { return r.slice(); });
+      this.engine.lastMove = s.lastMove;
+      this.engine.turn = s.turn;
+      this.engine.captures = { 1: s.captures[1], 2: s.captures[2] };
+    }
+    this.replaying = false;
+    if (this.ui.replayBar) this.ui.replayBar.style.display = 'none';
+    this.renderer.setMarks([]);
+    this.refresh();
+    if (!silent) this.setStatus('已離開覆盤，回到對局。', '');
+  };
+
+  VsController.prototype.replayGoto = function (idx) {
+    var rec = this.engine.record;
+    if (!this.replaying || !rec) return;
+    this.replayIdx = Math.max(0, Math.min(idx, rec.length - 1));
+    this.renderReplay();
+  };
+
+  VsController.prototype.renderReplay = function () {
+    var rec = this.engine.record;
+    var k = this.replayIdx;
+    var f = rec[k];
+    // 把該手盤面套進 engine 供繪製
+    this.engine.board = f.board.map(function (r) { return r.slice(); });
+    this.engine.lastMove = f.lastMove;
+    this.renderer.setMarks([]);
+
+    var total = rec.length - 1;
+    var info;
+    if (k === 0) {
+      info = '起手前（第 0 / ' + total + ' 手）';
+    } else if (f.pass) {
+      info = '第 ' + k + ' / ' + total + ' 手：' + (f.pass === B ? '⚫ 黑' : '⚪ 白') + ' 虛手 (Pass)';
+    } else if (f.lastMove) {
+      var who = f.lastMove.color === B ? '⚫ 黑' : '⚪ 白';
+      var coord = coordLabel(this.engine, f.lastMove.x, f.lastMove.y);
+      info = '第 ' + k + ' / ' + total + ' 手：' + who + ' 下 ' + coord;
+      if (global.Teach) {
+        var c = global.Teach.commentMove(this.engine, f.lastMove.x, f.lastMove.y, f.lastMove.color, f.captured);
+        info += '　' + c.icon + ' ' + c.text;
+      }
+    }
+    if (this.ui.replayInfo) this.ui.replayInfo.textContent = info;
   };
 
   VsController.prototype.afterMove = function (res, who) {
@@ -211,7 +292,7 @@
   };
 
   VsController.prototype.undo = function () {
-    if (this.gameOver || this.thinking) return;
+    if (this.gameOver || this.thinking || this.replaying) return;
     // 對電腦時一次退兩手(退回玩家)，雙人退一手
     this.engine.undo();
     if (this.mode === 'ai' && this.engine.turn === this.aiColor) this.engine.undo();
@@ -221,7 +302,7 @@
   };
 
   VsController.prototype.pass = function () {
-    if (this.gameOver || this.thinking) return;
+    if (this.gameOver || this.thinking || this.replaying) return;
     var ended = this.engine.pass();
     this.renderer.draw();
     this.refresh();

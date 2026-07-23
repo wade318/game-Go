@@ -194,6 +194,23 @@ select {
   user-select: none;
 }
 
+/* 覆盤導覽列 */
+.replay-bar {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  background: #fff4e0;
+  border: 2px solid #ffd089;
+}
+.replay-info {
+  font-size: 14px;
+  line-height: 1.55;
+  font-weight: 600;
+  margin-bottom: 8px;
+  min-height: 40px;
+}
+.replay-bar .btn { font-size: 13px; padding: 9px 6px; min-width: 56px; }
+
 /* 練習頁 */
 .prob-title { margin: 0 0 8px; font-size: 20px; color: var(--red-dark); }
 .prob-desc { font-size: 15px; line-height: 1.6; }

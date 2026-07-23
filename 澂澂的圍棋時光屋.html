@@ -205,6 +205,23 @@ select {
   user-select: none;
 }
 
+/* 覆盤導覽列 */
+.replay-bar {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  background: #fff4e0;
+  border: 2px solid #ffd089;
+}
+.replay-info {
+  font-size: 14px;
+  line-height: 1.55;
+  font-weight: 600;
+  margin-bottom: 8px;
+  min-height: 40px;
+}
+.replay-bar .btn { font-size: 13px; padding: 9px 6px; min-width: 56px; }
+
 /* 練習頁 */
 .prob-title { margin: 0 0 8px; font-size: 20px; color: var(--red-dark); }
 .prob-desc { font-size: 15px; line-height: 1.6; }
@@ -387,6 +404,7 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
 
         <div class="row">
           <button class="btn hint" id="vs-hint">💡 提示一手</button>
+          <button class="btn" id="vs-replay">📖 覆盤</button>
         </div>
         <div class="row">
           <button class="btn gray" id="vs-undo">↩️ 悔棋</button>
@@ -401,6 +419,17 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
         <div class="teach" id="vs-teach"></div>
         <label class="teach-toggle"><input type="checkbox" id="vs-teach-toggle" checked> 💬 顯示每手解說</label>
         <div class="score" id="vs-score"></div>
+
+        <div class="replay-bar" id="vs-replay-bar" style="display:none">
+          <div class="replay-info" id="vs-replay-info"></div>
+          <div class="row">
+            <button class="btn gray" id="vs-rp-first">⏮ 開頭</button>
+            <button class="btn gray" id="vs-rp-prev">◀ 上一手</button>
+            <button class="btn gray" id="vs-rp-next">下一手 ▶</button>
+            <button class="btn gray" id="vs-rp-last">最後 ⏭</button>
+          </div>
+          <button class="btn red" id="vs-rp-exit">✖ 離開覆盤</button>
+        </div>
       </div>
     </div>
   </section>
@@ -467,6 +496,26 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
     this.history = [];           // 每步快照，供悔棋
     this.lastMove = null;
     this.passes = 0;
+    this.record = [];            // 覆盤用：每手後的盤面快照
+    this.recordReset();
+  };
+
+  // 覆盤快照工具 ----------------------------------------------------
+  GoEngine.prototype._frame = function (move, captured) {
+    return {
+      board: this.board.map(function (r) { return r.slice(); }),
+      captures: { 1: this.captures[1], 2: this.captures[2] },
+      lastMove: move,           // { x, y, color } 或 null（起手/虛手）
+      captured: captured || 0,
+      moveNo: this.record ? this.record.length : 0
+    };
+  };
+
+  // 以「目前盤面」為第 0 手起點（讓子擺完後呼叫，含讓子）
+  GoEngine.prototype.recordReset = function () {
+    var f = this._frame(null, 0);
+    f.moveNo = 0;
+    this.record = [f];
   };
 
   GoEngine.prototype.inBounds = function (x, y) {
@@ -592,6 +641,7 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
     this.lastMove = { x: x, y: y, color: color };
     this.turn = opp;
     this.passes = 0;
+    if (this.record) this.record.push(this._frame(this.lastMove, res.captured.length));
     return { legal: true, captured: res.captured };
   };
 
@@ -599,8 +649,14 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
     this.pushHistory();
     this.koPoint = null;
     this.lastMove = null;
+    var passColor = this.turn;
     this.passes += 1;
     this.turn = this.opponent(this.turn);
+    if (this.record) {
+      var f = this._frame(null, 0);
+      f.pass = passColor;   // 記錄虛手方
+      this.record.push(f);
+    }
     return this.passes >= 2; // 連續兩 pass 即終局
   };
 
@@ -623,6 +679,7 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
     this.koPoint = s.koPoint;
     this.lastMove = s.lastMove;
     this.passes = 0;
+    if (this.record && this.record.length > 1) this.record.pop();
     return true;
   };
 
@@ -1409,6 +1466,8 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
     this.ai = new global.GoAI(this.engine, LEVELS[this.level].strength);
     this.handicap = ui.handicapSel ? parseInt(ui.handicapSel.value, 10) : 0;
     this.teachOff = ui.teachToggle ? !ui.teachToggle.checked : false;
+    this.replaying = false;
+    this.replayIdx = 0;
     this.mode = 'ai';        // 'ai' | 'human'
     this.aiColor = W;        // 電腦執白，玩家執黑先
     this.gameOver = false;
@@ -1446,6 +1505,12 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
       });
     }
     if (ui.hintBtn) ui.hintBtn.addEventListener('click', function () { self.hint(); });
+    if (ui.replayBtn) ui.replayBtn.addEventListener('click', function () { self.enterReplay(); });
+    if (ui.rpFirst) ui.rpFirst.addEventListener('click', function () { self.replayGoto(0); });
+    if (ui.rpPrev) ui.rpPrev.addEventListener('click', function () { self.replayGoto(self.replayIdx - 1); });
+    if (ui.rpNext) ui.rpNext.addEventListener('click', function () { self.replayGoto(self.replayIdx + 1); });
+    if (ui.rpLast) ui.rpLast.addEventListener('click', function () { self.replayGoto(self.engine.record.length - 1); });
+    if (ui.rpExit) ui.rpExit.addEventListener('click', function () { self.exitReplay(); });
     ui.undoBtn.addEventListener('click', function () { self.undo(); });
     ui.passBtn.addEventListener('click', function () { self.pass(); });
     ui.resignBtn.addEventListener('click', function () { self.resign(); });
@@ -1453,6 +1518,7 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
   };
 
   VsController.prototype.restart = function () {
+    if (this.replaying) this.exitReplay(true);
     this.engine.reset();
     this.gameOver = false;
     this.thinking = false;
@@ -1468,6 +1534,7 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
       handInfo = '（讓 ' + this.handicap + ' 子）';
     }
 
+    this.engine.recordReset();    // 以目前盤面（含讓子）為覆盤起點
     this.renderer.setMarks([]);   // 清掉提示標記並重繪
     this.refresh();
 
@@ -1497,7 +1564,7 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
   };
 
   VsController.prototype.handleClick = function (x, y) {
-    if (this.gameOver || this.thinking) return;
+    if (this.gameOver || this.thinking || this.replaying) return;
     if (this.isAiTurn()) return;   // 電腦回合不接受點擊
 
     var res = this.engine.play(x, y);
@@ -1513,7 +1580,7 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
 
   // 提示一手：用強 AI 評估幫目前該下的一方找個好點，標在盤上並解說為什麼
   VsController.prototype.hint = function () {
-    if (this.gameOver || this.thinking) return;
+    if (this.gameOver || this.thinking || this.replaying) return;
     if (this.isAiTurn()) { this.setStatus('現在是電腦回合，等牠下完再按提示 🙂', 'warn'); return; }
     var color = this.engine.turn;
     var helper = new global.GoAI(this.engine, 5);
@@ -1533,6 +1600,77 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
     if (this.ui.teachEl && !this.teachOff) {
       this.ui.teachEl.textContent = comment.icon + ' 為什麼：' + comment.text;
     }
+  };
+
+  // ===== 覆盤（棋譜回顧）=====
+  VsController.prototype.enterReplay = function () {
+    if (this.thinking) return;
+    var rec = this.engine.record;
+    if (!rec || rec.length < 2) {
+      this.setStatus('還沒有棋步可以覆盤，先下幾手吧 🙂', 'warn');
+      return;
+    }
+    // 保存目前實戰盤面，覆盤結束後還原
+    this.savedLive = {
+      board: this.engine.board.map(function (r) { return r.slice(); }),
+      lastMove: this.engine.lastMove,
+      turn: this.engine.turn,
+      captures: { 1: this.engine.captures[1], 2: this.engine.captures[2] }
+    };
+    this.replaying = true;
+    this.replayIdx = rec.length - 1;
+    if (this.ui.replayBar) this.ui.replayBar.style.display = 'block';
+    this.renderReplay();
+  };
+
+  VsController.prototype.exitReplay = function (silent) {
+    if (!this.replaying) return;
+    var s = this.savedLive;
+    if (s) {
+      this.engine.board = s.board.map(function (r) { return r.slice(); });
+      this.engine.lastMove = s.lastMove;
+      this.engine.turn = s.turn;
+      this.engine.captures = { 1: s.captures[1], 2: s.captures[2] };
+    }
+    this.replaying = false;
+    if (this.ui.replayBar) this.ui.replayBar.style.display = 'none';
+    this.renderer.setMarks([]);
+    this.refresh();
+    if (!silent) this.setStatus('已離開覆盤，回到對局。', '');
+  };
+
+  VsController.prototype.replayGoto = function (idx) {
+    var rec = this.engine.record;
+    if (!this.replaying || !rec) return;
+    this.replayIdx = Math.max(0, Math.min(idx, rec.length - 1));
+    this.renderReplay();
+  };
+
+  VsController.prototype.renderReplay = function () {
+    var rec = this.engine.record;
+    var k = this.replayIdx;
+    var f = rec[k];
+    // 把該手盤面套進 engine 供繪製
+    this.engine.board = f.board.map(function (r) { return r.slice(); });
+    this.engine.lastMove = f.lastMove;
+    this.renderer.setMarks([]);
+
+    var total = rec.length - 1;
+    var info;
+    if (k === 0) {
+      info = '起手前（第 0 / ' + total + ' 手）';
+    } else if (f.pass) {
+      info = '第 ' + k + ' / ' + total + ' 手：' + (f.pass === B ? '⚫ 黑' : '⚪ 白') + ' 虛手 (Pass)';
+    } else if (f.lastMove) {
+      var who = f.lastMove.color === B ? '⚫ 黑' : '⚪ 白';
+      var coord = coordLabel(this.engine, f.lastMove.x, f.lastMove.y);
+      info = '第 ' + k + ' / ' + total + ' 手：' + who + ' 下 ' + coord;
+      if (global.Teach) {
+        var c = global.Teach.commentMove(this.engine, f.lastMove.x, f.lastMove.y, f.lastMove.color, f.captured);
+        info += '　' + c.icon + ' ' + c.text;
+      }
+    }
+    if (this.ui.replayInfo) this.ui.replayInfo.textContent = info;
   };
 
   VsController.prototype.afterMove = function (res, who) {
@@ -1588,7 +1726,7 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
   };
 
   VsController.prototype.undo = function () {
-    if (this.gameOver || this.thinking) return;
+    if (this.gameOver || this.thinking || this.replaying) return;
     // 對電腦時一次退兩手(退回玩家)，雙人退一手
     this.engine.undo();
     if (this.mode === 'ai' && this.engine.turn === this.aiColor) this.engine.undo();
@@ -1598,7 +1736,7 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
   };
 
   VsController.prototype.pass = function () {
-    if (this.gameOver || this.thinking) return;
+    if (this.gameOver || this.thinking || this.replaying) return;
     var ended = this.engine.pass();
     this.renderer.draw();
     this.refresh();
@@ -2104,6 +2242,14 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
       levelSel: document.getElementById('vs-level'),
       handicapSel: document.getElementById('vs-handicap'),
       hintBtn: document.getElementById('vs-hint'),
+      replayBtn: document.getElementById('vs-replay'),
+      replayBar: document.getElementById('vs-replay-bar'),
+      replayInfo: document.getElementById('vs-replay-info'),
+      rpFirst: document.getElementById('vs-rp-first'),
+      rpPrev: document.getElementById('vs-rp-prev'),
+      rpNext: document.getElementById('vs-rp-next'),
+      rpLast: document.getElementById('vs-rp-last'),
+      rpExit: document.getElementById('vs-rp-exit'),
       undoBtn: document.getElementById('vs-undo'),
       passBtn: document.getElementById('vs-pass'),
       resignBtn: document.getElementById('vs-resign'),

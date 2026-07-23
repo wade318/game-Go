@@ -32,6 +32,26 @@
     this.history = [];           // 每步快照，供悔棋
     this.lastMove = null;
     this.passes = 0;
+    this.record = [];            // 覆盤用：每手後的盤面快照
+    this.recordReset();
+  };
+
+  // 覆盤快照工具 ----------------------------------------------------
+  GoEngine.prototype._frame = function (move, captured) {
+    return {
+      board: this.board.map(function (r) { return r.slice(); }),
+      captures: { 1: this.captures[1], 2: this.captures[2] },
+      lastMove: move,           // { x, y, color } 或 null（起手/虛手）
+      captured: captured || 0,
+      moveNo: this.record ? this.record.length : 0
+    };
+  };
+
+  // 以「目前盤面」為第 0 手起點（讓子擺完後呼叫，含讓子）
+  GoEngine.prototype.recordReset = function () {
+    var f = this._frame(null, 0);
+    f.moveNo = 0;
+    this.record = [f];
   };
 
   GoEngine.prototype.inBounds = function (x, y) {
@@ -157,6 +177,7 @@
     this.lastMove = { x: x, y: y, color: color };
     this.turn = opp;
     this.passes = 0;
+    if (this.record) this.record.push(this._frame(this.lastMove, res.captured.length));
     return { legal: true, captured: res.captured };
   };
 
@@ -164,8 +185,14 @@
     this.pushHistory();
     this.koPoint = null;
     this.lastMove = null;
+    var passColor = this.turn;
     this.passes += 1;
     this.turn = this.opponent(this.turn);
+    if (this.record) {
+      var f = this._frame(null, 0);
+      f.pass = passColor;   // 記錄虛手方
+      this.record.push(f);
+    }
     return this.passes >= 2; // 連續兩 pass 即終局
   };
 
@@ -188,6 +215,7 @@
     this.koPoint = s.koPoint;
     this.lastMove = s.lastMove;
     this.passes = 0;
+    if (this.record && this.record.length > 1) this.record.pop();
     return true;
   };
 
