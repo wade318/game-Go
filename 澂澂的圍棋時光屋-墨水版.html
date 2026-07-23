@@ -1345,6 +1345,11 @@ canvas.celebrate { animation: none !important; }
     9: [[3, 3], [9, 3], [3, 9], [9, 9], [3, 6], [9, 6], [6, 3], [6, 9], [6, 6]]
   };
 
+  // 電腦中盤認輸：走到「中盤」之後才評估，須「面積落後」且「材料(被吃子)落後」才投子
+  var RESIGN_MIN_MOVES = 30;   // 至少下滿這麼多手才評估（避免開局亂認輸）
+  var RESIGN_MARGIN = 18;      // 面積落後超過這麼多目視為落後
+  var RESIGN_CAP_DIFF = 8;     // 且被黑吃掉的子比白吃掉的多這麼多（材料大幅落後，最可靠的訊號）
+
   function VsController(ui) {
     this.ui = ui;
     this.engine = new global.GoEngine(13);
@@ -1594,8 +1599,37 @@ canvas.celebrate { animation: none !important; }
     global.FX.pop();
   };
 
+  // 中盤認輸評估：走到中盤後，電腦(白)若面積大幅落後就投子
+  VsController.prototype.shouldAiResign = function () {
+    if (this.mode !== 'ai' || this.gameOver) return false;
+    var e = this.engine;
+    var moves = e.record ? e.record.length - 1 : 0;
+    if (moves < RESIGN_MIN_MOVES) return false;
+    var s = e.scoreEstimate();
+    var areaMargin = s.white - s.black;                    // 電腦(白)面積領先，負值=落後
+    var capDiff = e.captures[B] - e.captures[W];           // 黑吃白 − 白吃黑，正值=白材料落後
+    // 讓子局：黑先天有子，門檻放寬
+    var areaThreshold = -(RESIGN_MARGIN + this.handicap * 3);
+    // 兩條件同時成立才認輸：面積大幅落後，且被吃子明顯較多（避免面積估算雜訊誤判）
+    return areaMargin <= areaThreshold && capDiff >= RESIGN_CAP_DIFF;
+  };
+
+  VsController.prototype.aiResign = function () {
+    this.gameOver = true;
+    this.thinking = false;
+    var s = this.engine.scoreEstimate();
+    this.setStatus('🏳️ 電腦認輸了，你贏了！🏆', 'ok');
+    this.ui.scoreEl.textContent = '（電腦大幅落後：黑 ' + s.black + ' vs 白 ' + s.white + '，投子認輸）';
+    if (this.ui.teachEl) this.ui.teachEl.textContent = '';
+    this.refresh();
+    if (global.FX) {
+      global.FX.celebrate({ big: true, text: '🏆 你贏了！🏆<br><span class="sub">電腦認輸</span>' });
+    }
+  };
+
   VsController.prototype.aiMove = function () {
     var self = this;
+    if (this.shouldAiResign()) { this.aiResign(); return; }
     this.thinking = true;
     this.setStatus('電腦思考中… 🤖', '');
     setTimeout(function () {
