@@ -49,7 +49,18 @@
     return libs;
   }
 
+  // 依等級路由：低級用啟發式（維持較弱、給小朋友贏）；高級用搜尋（明顯變強）
   GoAI.prototype.chooseMove = function (color) {
+    var s = this.strength;
+    if (s >= 3 && global.GoSearch) {
+      var depth = s >= 5 ? 3 : (s >= 4 ? 2 : 1);
+      var mv = global.GoSearch.chooseMove(this.engine, color, depth);
+      if (mv) return mv;
+    }
+    return this.chooseMoveHeuristic(color);
+  };
+
+  GoAI.prototype.chooseMoveHeuristic = function (color) {
     var e = this.engine;
     var moves = e.legalMoves(color);
     if (!moves.length) return null;

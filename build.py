@@ -9,9 +9,9 @@ import re
 import base64
 import os
 
-COLOR_JS = ['js/engine.js', 'js/render.js', 'js/ai.js', 'js/teach.js',
+COLOR_JS = ['js/engine.js', 'js/render.js', 'js/ai.js', 'js/ai-search.js', 'js/teach.js',
             'js/problems-gen.js', 'js/fx.js', 'js/vs.js', 'js/practice.js']
-EINK_JS = ['js/engine.js', 'js/render.js', 'js/ai.js', 'js/teach.js',
+EINK_JS = ['js/engine.js', 'js/render.js', 'js/ai.js', 'js/ai-search.js', 'js/teach.js',
            'js/problems-gen.js', 'js/vs.js', 'js/practice.js']  # 墨水版不載入 fx.js
 
 
