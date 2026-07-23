@@ -113,6 +113,7 @@ button.btn {
 }
 /* 主要動作用實心黑，最醒目 */
 button.btn.green { background: #000; color: #fff; }
+button.btn.hint { background: #e6e6e6; border-style: dashed; }
 button.btn:disabled { color: #999; border-color: #999; cursor: not-allowed; }
 button.btn.reset { width: 100%; margin-top: 10px; font-size: 14px; }
 

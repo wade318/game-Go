@@ -156,6 +156,7 @@ button.btn:disabled { background: #c9c4bb; cursor: not-allowed; box-shadow: none
 button.btn.red { background: var(--red); }
 button.btn.green { background: var(--green); }
 button.btn.gray { background: #8a8577; }
+button.btn.hint { background: #2a9d3f; }
 
 select {
   width: 100%;
@@ -384,6 +385,9 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
           </div>
         </div>
 
+        <div class="row">
+          <button class="btn hint" id="vs-hint">💡 提示一手</button>
+        </div>
         <div class="row">
           <button class="btn gray" id="vs-undo">↩️ 悔棋</button>
           <button class="btn" id="vs-pass">⏭️ 虛手</button>
@@ -1441,6 +1445,7 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
         if (self.teachOff && ui.teachEl) ui.teachEl.textContent = '';
       });
     }
+    if (ui.hintBtn) ui.hintBtn.addEventListener('click', function () { self.hint(); });
     ui.undoBtn.addEventListener('click', function () { self.undo(); });
     ui.passBtn.addEventListener('click', function () { self.pass(); });
     ui.resignBtn.addEventListener('click', function () { self.resign(); });
@@ -1463,7 +1468,7 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
       handInfo = '（讓 ' + this.handicap + ' 子）';
     }
 
-    this.renderer.draw();
+    this.renderer.setMarks([]);   // 清掉提示標記並重繪
     this.refresh();
 
     if (this.mode === 'ai') {
@@ -1500,10 +1505,34 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
       this.setStatus('這裡不能下（' + reasonText(res.reason) + '）', 'warn');
       return;
     }
-    this.renderer.draw();
+    this.renderer.setMarks([]);   // 落子後清掉提示標記
     this.afterMove(res, 'you');
 
     if (!this.gameOver && this.isAiTurn()) this.aiMove();
+  };
+
+  // 提示一手：用強 AI 評估幫目前該下的一方找個好點，標在盤上並解說為什麼
+  VsController.prototype.hint = function () {
+    if (this.gameOver || this.thinking) return;
+    if (this.isAiTurn()) { this.setStatus('現在是電腦回合，等牠下完再按提示 🙂', 'warn'); return; }
+    var color = this.engine.turn;
+    var helper = new global.GoAI(this.engine, 5);
+    var mv = helper.chooseMove(color);
+    if (!mv) { this.setStatus('目前沒有適合的點，可以考慮「虛手」', 'warn'); return; }
+
+    // 預覽這一手以取得解說，再還原（不真的落子）
+    var res = this.engine.play(mv.x, mv.y);
+    var comment = global.Teach
+      ? global.Teach.commentMove(this.engine, mv.x, mv.y, color, res.captured.length)
+      : { icon: '💡', text: '' };
+    this.engine.undo();
+
+    var mark = { x: mv.x, y: mv.y, type: 'square', color: this.ui.eink ? '#000000' : '#2a9d3f' };
+    this.renderer.setMarks([mark]);
+    this.setStatus('💡 建議下在 ' + coordLabel(this.engine, mv.x, mv.y) + '（方框處）', 'ok');
+    if (this.ui.teachEl && !this.teachOff) {
+      this.ui.teachEl.textContent = comment.icon + ' 為什麼：' + comment.text;
+    }
   };
 
   VsController.prototype.afterMove = function (res, who) {
@@ -1608,6 +1637,12 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
 
   function reasonText(r) {
     return { occupied: '已有棋子', ko: '打劫不能馬上提回', suicide: '會沒有氣', out: '出界' }[r] || '不行';
+  }
+
+  // 座標標籤，如 (6,6) → G7（跳過 I）
+  function coordLabel(engine, x, y) {
+    var letters = 'ABCDEFGHJKLMNOPQRST';
+    return letters[x] + (engine.size - y);
   }
 
   global.VsController = VsController;
@@ -2068,6 +2103,7 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
       modeSel: document.getElementById('vs-mode'),
       levelSel: document.getElementById('vs-level'),
       handicapSel: document.getElementById('vs-handicap'),
+      hintBtn: document.getElementById('vs-hint'),
       undoBtn: document.getElementById('vs-undo'),
       passBtn: document.getElementById('vs-pass'),
       resignBtn: document.getElementById('vs-resign'),

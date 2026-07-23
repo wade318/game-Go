@@ -145,6 +145,7 @@ button.btn:disabled { background: #c9c4bb; cursor: not-allowed; box-shadow: none
 button.btn.red { background: var(--red); }
 button.btn.green { background: var(--green); }
 button.btn.gray { background: #8a8577; }
+button.btn.hint { background: #2a9d3f; }
 
 select {
   width: 100%;
