@@ -1326,7 +1326,7 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
     return { x: pick.x, y: pick.y };
   }
 
-  global.GoSearch = { chooseMove: chooseMove, _eval: evalBoard };
+  global.GoSearch = { chooseMove: chooseMove };
 })(window);
 
 </script>
@@ -1601,7 +1601,7 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
     return out;
   }
 
-  global.ProblemGen = { genSet: genSet, _gen: GENERATORS, _rng: makeRng };
+  global.ProblemGen = { genSet: genSet };
 })(window);
 
 </script>
@@ -2796,7 +2796,6 @@ footer { text-align: center; font-size: 12px; opacity: .5; padding: 10px; }
 
   global.PracticeController = PracticeController;
   global.GO_PROBLEMS = PROBLEMS;
-  global.GO_BUILD_CATEGORIES = buildCategories;
 })(window);
 
 </script>

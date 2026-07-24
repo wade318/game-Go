@@ -1224,7 +1224,7 @@ canvas.celebrate { animation: none !important; }
     return { x: pick.x, y: pick.y };
   }
 
-  global.GoSearch = { chooseMove: chooseMove, _eval: evalBoard };
+  global.GoSearch = { chooseMove: chooseMove };
 })(window);
 
 </script>
@@ -1499,7 +1499,7 @@ canvas.celebrate { animation: none !important; }
     return out;
   }
 
-  global.ProblemGen = { genSet: genSet, _gen: GENERATORS, _rng: makeRng };
+  global.ProblemGen = { genSet: genSet };
 })(window);
 
 </script>
@@ -2464,7 +2464,6 @@ canvas.celebrate { animation: none !important; }
 
   global.PracticeController = PracticeController;
   global.GO_PROBLEMS = PROBLEMS;
-  global.GO_BUILD_CATEGORIES = buildCategories;
 })(window);
 
 </script>

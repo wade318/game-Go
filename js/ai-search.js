@@ -167,5 +167,5 @@
     return { x: pick.x, y: pick.y };
   }
 
-  global.GoSearch = { chooseMove: chooseMove, _eval: evalBoard };
+  global.GoSearch = { chooseMove: chooseMove };
 })(window);

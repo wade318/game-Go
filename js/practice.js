@@ -568,5 +568,4 @@
 
   global.PracticeController = PracticeController;
   global.GO_PROBLEMS = PROBLEMS;
-  global.GO_BUILD_CATEGORIES = buildCategories;
 })(window);

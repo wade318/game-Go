@@ -209,5 +209,5 @@
     return out;
   }
 
-  global.ProblemGen = { genSet: genSet, _gen: GENERATORS, _rng: makeRng };
+  global.ProblemGen = { genSet: genSet };
 })(window);
